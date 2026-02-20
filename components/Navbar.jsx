@@ -12,6 +12,25 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { logoutUser } from "@/redux/authSlice";
 import { useEffect } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FiLogOut } from "react-icons/fi";
+import { FaEdit } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
+import { ImBlogger2 } from "react-icons/im";
+import { FaComments } from "react-icons/fa6";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -93,12 +112,56 @@ const Navbar = () => {
             </Button>
             {user ? (
               <>
-                <Avatar className="mx-4 flex gap-3 items-center">
-                  <AvatarImage
-                    src={user?.photoURL || "https://github.com/shadcn.png"}
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    asChild
+                    className="mx-4 flex gap-3 items-center"
+                  >
+                    <Avatar>
+                      <AvatarImage
+                        src={user?.photoURL || "https://github.com/shadcn.png"}
+                        alt="Avatar"
+                      />
+                      <AvatarFallback>SY</AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40" align="start">
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <Link href="/dashboard" className="w-full">
+                        <DropdownMenuItem>
+                          <CgProfile />
+                          Profile
+                          <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </Link>
+                      <DropdownMenuItem>
+                        <ImBlogger2 />
+                        Your Blogs
+                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <FaComments />
+                        Comments
+                        <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <FaEdit />
+                        Write Blogs
+                        <DropdownMenuShortcut>⌘WB</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem>
+                        <FiLogOut />
+                        Log out
+                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
                 <Button onClick={logoutHandler}>Logout</Button>
               </>
             ) : (
