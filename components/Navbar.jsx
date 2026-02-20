@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { Input } from "./ui/input";
@@ -5,11 +6,39 @@ import { Button } from "./ui/button";
 import { Search } from "lucide-react";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../redux/themeSlice";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { logoutUser } from "@/redux/authSlice";
+import { useEffect } from "react";
 
 const Navbar = () => {
-  const user = true;
+  const dispatch = useDispatch();
+
+  const { user, isAuthenticated, message, error } = useSelector(
+    (state) => state.auth,
+  );
+  const { theme } = useSelector((state) => state.theme);
+
+  const logoutHandler = () => {
+    dispatch(logoutUser());
+  };
+
+  useEffect(() => {
+    if (message && !isAuthenticated) {
+      toast.success(message);
+      console.log("Logout message:", message);
+      console.log("Logout user:", user);
+    }
+
+    if (error) {
+      toast.error(error);
+    }
+  }, [message, error, isAuthenticated]);
+
   return (
-    <div className="py-4 fixed w-full dark:bg-gray-800 dark:border-b-gray-600 border-b-gray-300 border-b-2 bg-white text-black z-50">
+    <div className="py-4 fixed w-full dark:bg-gray-800 dark:border-b-gray-600 border-b-gray-300 border-b-2 bg-white z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4 md:px-0">
         {/* logo section */}
         <div className="flex gap-7 items-center">
@@ -22,7 +51,7 @@ const Navbar = () => {
                 width={20}
                 height={20}
               />
-              <h1 className=" px-3 py-1 rounded-md font-bold text-3xl md:text-4xl">
+              <h1 className="px-3 py-1 rounded-md font-bold text-3xl md:text-4xl">
                 Logo
               </h1>
             </div>
@@ -42,7 +71,7 @@ const Navbar = () => {
         <nav className="flex md:gap-7 gap-4 items-center">
           <ul className="hidden md:flex gap-7 items-center text-xl font-semibold">
             <Link href="/" className="cursor-pointer px-3 py-1 rounded-md">
-              <li>Home</li>
+              Home
             </Link>
             <Link
               href="/blogs"
@@ -59,15 +88,19 @@ const Navbar = () => {
             {/* <NavLink to={'/write-blog'} className={`cursor-pointer text-white px-3 py-1 rounded-md`}><li>Write a Blog</li></NavLink> */}
           </ul>
           <div className="flex">
-            <Button className="">
-              {/* {theme === "light" ? <FaMoon /> : <FaSun />} */}
-              <FaMoon />
+            <Button className="" onClick={() => dispatch(toggleTheme())}>
+              {theme === "light" ? <FaMoon /> : <FaSun />}
             </Button>
             {user ? (
-              <Avatar className="ml-7 flex gap-3 items-center">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <>
+                <Avatar className="mx-4 flex gap-3 items-center">
+                  <AvatarImage
+                    src={user?.photoURL || "https://github.com/shadcn.png"}
+                  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <Button onClick={logoutHandler}>Logout</Button>
+              </>
             ) : (
               <div className="ml-7 md:flex gap-2 ">
                 <Link href="/login">

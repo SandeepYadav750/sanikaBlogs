@@ -13,19 +13,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TbEyeOff, TbEye } from "react-icons/tb";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../redux/authSlice";
+import { ImSpinner2 } from "react-icons/im";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-   const [login, setLogin] = useState({
+  const [login, setLogin] = useState({
     email: "",
     password: "",
   });
+
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  // ✅ FIXED — correct slice name
+  const { user, loading, message, error, isAuthenticated } = useSelector(
+    (state) => state.auth,
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,38 +45,23 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    // if (!user.password || user.password.length < 6) {
-    //   toast.error("Password must be at least 6 characters");
-    //   return;
-    // }
-
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/api/user/login",
-        login,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        },
-      );
-
-      if (res.data.success) {
-        toast.success("Login successful!");
-        router.push("/");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Registration failed");
-      } else {
-        toast.error("Something went wrong");
-      }
-    }
+    dispatch(loginUser(login));
   };
+
+  // ✅ FIXED useEffect
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+
+    if (isAuthenticated && user) {
+      toast.success(message || "Login successfulwfwedwed!");
+      router.push("/");
+    }
+  }, [error, isAuthenticated, user, message, router]);
+
   return (
     <section className=" bg-linear-to-b dark:from-gray-900 dark:to-gray-800 from-gray-50 to-white flex items-center justify-center p-4 md:p-0">
       {/* Image Content */}
@@ -140,7 +135,15 @@ const Login = () => {
                   </div>
                 </div>
                 <div className="flex-col gap-2">
-                  <Button className="w-full">Login</Button>
+                  <Button className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <ImSpinner2 className="animate-spin" /> Please Wait...
+                      </>
+                    ) : (
+                      "Login"
+                    )}
+                  </Button>
                   <p className="text-center text-gray-600 dark:text-gray-400">
                     Already have an account?{" "}
                     <Link

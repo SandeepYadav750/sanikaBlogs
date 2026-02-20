@@ -22,7 +22,7 @@ const Hero = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link href="/blogs">
-                <Button className="0 text-white px-8 py-6 text-lg rounded-lg">
+                <Button className=" px-8 py-6 text-lg rounded-lg">
                   Explore Blogs
                 </Button>
               </Link>

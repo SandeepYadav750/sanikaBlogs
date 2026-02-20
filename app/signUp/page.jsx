@@ -1,23 +1,23 @@
 "use client";
+
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TbEyeOff, TbEye } from "react-icons/tb";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser } from "../../redux/authSlice";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,8 +27,13 @@ const SignUp = () => {
     email: "",
     password: "",
   });
+
+  const dispatch = useDispatch();
   const router = useRouter();
 
+  const { loading, error, message } = useSelector((state) => state.auth);
+
+  console.log("REDUX STATE:", { message, error });
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser((prev) => ({
@@ -37,38 +42,29 @@ const SignUp = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // if (!user.password || user.password.length < 6) {
+    // if (user.password.length < 6) {
     //   toast.error("Password must be at least 6 characters");
     //   return;
     // }
 
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/api/user/register",
-        user,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        },
-      );
-
-      if (res.data.success) {
-        toast.success("Registration successful!");
-        router.push("/login");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Registration failed");
-      } else {
-        toast.error("Something went wrong");
-      }
-    }
+    dispatch(registerUser(user));
   };
+
+  const userData = useSelector((state) => state.auth.user);
+  console.log("userData:", { userData });
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+    if (userData) {
+      toast.success(message || "Registration successful!ERE");
+      router.push("/login");
+    }
+  }, [userData, router, error]);
 
   return (
     <section className="bg-linear-to-b dark:from-gray-900 dark:to-gray-800 from-gray-50 to-white flex items-center justify-center p-4 md:p-0">
@@ -82,7 +78,7 @@ const SignUp = () => {
           className="w-[95%] h-164"
         />
       </div>
-      <div className=" md:w-1/3  flex items-center justify-center">
+      <div className=" md:w-1/3 flex items-center justify-center">
         <Card className="w-full max-w-sm m-2">
           <CardHeader>
             <CardTitle className="text-center text-2xl">
@@ -178,9 +174,17 @@ const SignUp = () => {
                   </div>
                 </div>
                 <div className="flex-col gap-2">
-                  <Button className="w-full">Sign Up</Button>
+                  <Button className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <ImSpinner2 className="animate-spin" /> Please Wait...
+                      </>
+                    ) : (
+                      "Sign Up"
+                    )}
+                  </Button>
                   <p className="text-center text-gray-600 dark:text-gray-400">
-                    Already have an account?{" "}
+                    Already have an account?
                     <Link
                       href="/login"
                       className="text-blue-600 hover:underline font-medium"
