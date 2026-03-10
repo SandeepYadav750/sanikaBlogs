@@ -1,9 +1,10 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Search } from "lucide-react";
+import { Router, Search } from "lucide-react";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,9 +32,21 @@ import { FaEdit } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { ImBlogger2 } from "react-icons/im";
 import { FaComments } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+  const linkClass = (href) => {
+    const base = "cursor-pointer px-3 py-1 rounded-md";
+    const active = pathname === href || pathname.startsWith(href + "/");
+    return `${base} ${
+      active
+        ? "bg-gray-200 dark:bg-gray-700"
+        : "hover:bg-gray-200 dark:hover:bg-gray-700"
+    }`;
+  };
 
   const { user, isAuthenticated, message, error } = useSelector(
     (state) => state.auth,
@@ -41,6 +54,7 @@ const Navbar = () => {
   const { theme } = useSelector((state) => state.theme);
 
   const logoutHandler = () => {
+    router.push("/login");
     dispatch(logoutUser());
   };
 
@@ -71,7 +85,7 @@ const Navbar = () => {
                 height={20}
               />
               <h1 className="px-3 py-1 rounded-md font-bold text-3xl md:text-4xl">
-                Logo
+                Logos
               </h1>
             </div>
           </Link>
@@ -89,22 +103,15 @@ const Navbar = () => {
         {/* nav section */}
         <nav className="flex md:gap-7 gap-4 items-center">
           <ul className="hidden md:flex gap-7 items-center text-xl font-semibold">
-            <Link href="/" className="cursor-pointer px-3 py-1 rounded-md">
+            <Link href="/" className={linkClass("/")}>
               Home
             </Link>
-            <Link
-              href="/blogs"
-              className={`cursor-pointer px-3 py-1 rounded-md`}
-            >
-              <li>Blogs</li>
+            <Link href="/blogs" className={linkClass("/blogs")}>
+              Blogs
             </Link>
-            <Link
-              href="/about"
-              className={`cursor-pointer px-3 py-1 rounded-md`}
-            >
-              <li>About</li>
+            <Link href="/about" className={linkClass("/about")}>
+              About
             </Link>
-            {/* <NavLink to={'/write-blog'} className={`cursor-pointer text-white px-3 py-1 rounded-md`}><li>Write a Blog</li></NavLink> */}
           </ul>
           <div className="flex">
             <Button className="" onClick={() => dispatch(toggleTheme())}>
@@ -128,41 +135,81 @@ const Navbar = () => {
                   <DropdownMenuContent className="w-40" align="start">
                     <DropdownMenuGroup>
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <Link href="/dashboard" className="w-full">
+                      <Link
+                        href="/dashboard/profile"
+                        className={`w-full ${
+                          pathname === "/dashboard/profile" ||
+                          pathname.startsWith("/dashboard/profile/")
+                            ? "bg-gray-200 dark:bg-gray-700"
+                            : ""
+                        }`}
+                      >
                         <DropdownMenuItem>
                           <CgProfile />
                           Profile
                           <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                         </DropdownMenuItem>
                       </Link>
-                      <DropdownMenuItem>
-                        <ImBlogger2 />
-                        Your Blogs
-                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <FaComments />
-                        Comments
-                        <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <FaEdit />
-                        Write Blogs
-                        <DropdownMenuShortcut>⌘WB</DropdownMenuShortcut>
-                      </DropdownMenuItem>
+                      <Link
+                        href="/dashboard/blogs"
+                        className={`w-full ${
+                          pathname === "/dashboard/blogs" ||
+                          pathname.startsWith("/dashboard/blogs/")
+                            ? "bg-gray-200 dark:bg-gray-700"
+                            : ""
+                        }`}
+                      >
+                        <DropdownMenuItem>
+                          <ImBlogger2 />
+                          Your Blogs
+                          <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link
+                        href="/dashboard/comments"
+                        className={`w-full ${
+                          pathname === "/dashboard/comments" ||
+                          pathname.startsWith("/dashboard/comments/")
+                            ? "bg-gray-200 dark:bg-gray-700"
+                            : ""
+                        }`}
+                      >
+                        <DropdownMenuItem>
+                          <FaComments />
+                          Comments
+                          <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link
+                        href="/dashboard/write-blog"
+                        className={`w-full ${
+                          pathname === "/dashboard/write-blog" ||
+                          pathname.startsWith("/dashboard/write-blog/")
+                            ? "bg-gray-200 dark:bg-gray-700"
+                            : ""
+                        }`}
+                      >
+                        <DropdownMenuItem>
+                          <FaEdit />
+                          Write Blogs
+                          <DropdownMenuShortcut>⌘WB</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <FiLogOut />
-                        Log out
-                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                      </DropdownMenuItem>
+                      {/* <Button > */}
+                        <DropdownMenuItem onClick={logoutHandler}>
+                          <FiLogOut />
+                          Logout
+                          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      {/* </Button> */}
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                <Button onClick={logoutHandler}>Logout</Button>
+                {/* <Button onClick={logoutHandler}>Logout</Button> */}
               </>
             ) : (
               <div className="ml-7 md:flex gap-2 ">

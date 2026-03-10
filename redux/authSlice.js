@@ -11,7 +11,7 @@ export const registerUser = createAsyncThunk(
       const res = await axios.post(`${API}/register`, userData, {
         withCredentials: true,
       });
-      return res.data;
+      return res.data; // Return the full response data
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Registration failed CUSTOM",
@@ -28,7 +28,7 @@ export const loginUser = createAsyncThunk(
       const res = await axios.post(`${API}/login`, userData, {
         withCredentials: true,
       });
-      console.log("SUCCESS RESPONSE:", res.data); // 👈 ADD THIS
+      console.log("SUCCESS RESPONSE:", res.data.user); // 👈 ADD THIS
       return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
