@@ -11,21 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FaFacebook, FaLinkedin } from "react-icons/fa";
-import { FaSquareXTwitter } from "react-icons/fa6";
+import { FaSquareXTwitter, FaSquareInstagram } from "react-icons/fa6";
 import EditProfileModal from "@/components/EditProfileModal";
 
 const Profile = () => {
-  const { user } = useSelector((state: any) => state.auth);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  //   console.log("User in Profile:", user);
-  //   console.log("User in Profile:", user.user);
-  //   console.log("User in Profile:", user.user.firstName);
+  const { user } = useSelector((state: any) => state.auth.user);
 
-  const displayName =
-    user.user.firstName + " " + user.user.lastName || " Guest User";
-  const aboutText =
-    user?.about ||
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const displayName = user.firstName + " " + user.lastName || " Guest User";
 
   const stats = [
     { title: "Total Views", value: "24.8K", change: "+12% from last month" },
@@ -40,19 +34,22 @@ const Profile = () => {
         <Card className="flex flex-col sm:flex-row items-center gap-6 p-6">
           <div className="flex flex-col items-center gap-2">
             <Avatar className="w-28 h-28">
-              <AvatarImage src={user.user.photoURL || "/avatar.png"} />
+              <AvatarImage src={user.photoURL || "/avatar.png"} />
               <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
             </Avatar>
-            <span>{user.user.occupation}</span>
+            <span>{user.occupation}</span>
             <div className="flex items-center justify-center gap-2 text-xl w-full">
-              <Link href={user.user.facebook || "#"} target="_blank">
+              <Link href={user.facebook} target="_blank">
                 <FaFacebook />
               </Link>
-              <Link href={user.user.twitter || "#"} target="_blank">
+              <Link href={user.twitter} target="_blank">
                 <FaSquareXTwitter />
               </Link>
-              <Link href={user.user.linkedin || "#"} target="_blank">
+              <Link href={user.linkedin} target="_blank">
                 <FaLinkedin />
+              </Link>
+              <Link href={user.instagram} target="_blank">
+                <FaSquareInstagram />
               </Link>
             </div>
           </div>
@@ -61,14 +58,14 @@ const Profile = () => {
               Welcome {displayName || "N/A"}
             </h2>
             <p className="my-2 text-sm text-gray-600 dark:text-gray-300">
-              Email : {user.user.email || "N/A"}
+              Email : {user.email || "N/A"}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-200">
               <span className="font-medium">About Me:</span>
             </p>
             <div className=" p-4 bg-gray-200 dark:bg-gray-800 rounded">
               <p className="text-sm text-gray-700 dark:text-gray-200">
-                {aboutText}
+                {user.bio}
               </p>
             </div>
             <Button onClick={() => setIsEditModalOpen(true)} className="mt-4">
@@ -83,7 +80,7 @@ const Profile = () => {
               <CardContent>
                 <CardTitle className="text-lg">{stat.title}</CardTitle>
                 <div className="mt-2 text-2xl font-semibold">{stat.value}</div>
-                <CardDescription className="mt-1">
+                <CardDescription className="mt-1 text-green-400">
                   {stat.change}
                 </CardDescription>
               </CardContent>
@@ -95,11 +92,11 @@ const Profile = () => {
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        initialData={user?.user}
-        onSave={(data: any) => {
-          console.log("Profile updated:", data);
-          // Add your API call here to update the user profile
-        }}
+        // initialData={user?.user}
+        // onSave={(data: any) => {
+        //   console.log("Profile updated:", data);
+        //   dispatch(setUser(data));
+        // }}
       />
     </div>
   );

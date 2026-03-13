@@ -54,6 +54,27 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+
+// 🔥 Update User THUNK
+export const updateUser = createAsyncThunk(
+  "auth/updateUser",
+  async (userData, { rejectWithValue }) => {
+    try {
+      const res = await axios.put(`${API}/profile/update`, userData, {
+        withCredentials: true,
+      });
+
+      return res.data; // { success, message }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Update failed"
+      );
+    }
+  }
+);
+
+
+
 // 🧠 SLICE
 const authSlice = createSlice({
   name: "auth",
@@ -70,6 +91,10 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
     },
+
+  setUser: (state, action) => {
+    state.user = action.payload;
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -80,7 +105,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = action.payload.user.user;
         state.isAuthenticated = true;
         state.message = action.payload.message; // 👈 success message
       })
@@ -120,7 +145,26 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+    
+    // UPDATE USER
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.message = action.payload.message; // 👈 success message
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+    
   },
 });
+
+export const { logout, setUser } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -57,7 +57,7 @@ const Login = () => {
     }
 
     if (isAuthenticated && user) {
-      toast.success(message || "Login successfulwfwedwed!");
+      toast.success(message || "Login successfull!");
       router.push("/");
     }
   }, [error, isAuthenticated, user, message, router]);
@@ -147,7 +147,7 @@ const Login = () => {
                   <p className="text-center text-gray-600 dark:text-gray-400">
                     Already have an account?{" "}
                     <Link
-                      href="/signup"
+                      href="/signUp"
                       className="text-blue-600 hover:underline font-medium"
                     >
                       Sign Up

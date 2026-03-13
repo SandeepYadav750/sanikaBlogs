@@ -4,13 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Router, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/themeSlice";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { logoutUser } from "@/redux/authSlice";
 import { useEffect } from "react";
 import {
@@ -126,7 +125,7 @@ const Navbar = () => {
                   >
                     <Avatar>
                       <AvatarImage
-                        src={user?.photoURL || "https://github.com/shadcn.png"}
+                        src={user.user?.photoURL || "https://github.com/shadcn.png"}
                         alt="Avatar"
                       />
                       <AvatarFallback>SY</AvatarFallback>

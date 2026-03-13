@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,23 +11,34 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { X } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { updateUser } from "@/redux/authSlice";
 
-const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
+const EditProfileModal = ({ isOpen, onClose }) => {
+  const { user } = useSelector((state) => state.auth.user);
+  // ✅ FIXED — correct slice name
+  const { loading, message, error } = useSelector((state) => state.auth, );
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
-    firstName: initialData?.firstName || "",
-    lastName: initialData?.lastName || "",
-    facebook: initialData?.facebook || "",
-    instagram: initialData?.instagram || "",
-    linkedin: initialData?.linkedin || "",
-    github: initialData?.github || "",
-    description: initialData?.description || "",
-    photoURL: initialData?.photoURL || "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    facebook: user?.facebook || "",
+    instagram: user?.instagram || "",
+    linkedin: user?.linkedin || "",
+    twitter: user?.twitter || "",
+    bio: user?.bio || "",
+    occupation: user?.occupation || "",
+    file: user?.photoURL || "",
   });
 
-  const [imagePreview, setImagePreview] = useState(initialData?.photoURL || "");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(user?.photoURL || "");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -35,31 +47,51 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+
     if (file) {
+      // store actual file
+      setImageFile(file);
+      console.log("Selected file:", file);
+
+      // preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setFormData((prev) => ({
-          ...prev,
-          photoURL: reader.result,
-        }));
+        console.log("Selected file preview:", reader.result);
       };
+
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave(formData);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formDataApp = new FormData();
+
+    formDataApp.append("firstName", formData.firstName);
+    formDataApp.append("lastName", formData.lastName);
+    formDataApp.append("bio", formData.bio);
+    formDataApp.append("occupation", formData.occupation);
+    formDataApp.append("facebook", formData.facebook);
+    formDataApp.append("instagram", formData.instagram);
+    formDataApp.append("linkedin", formData.linkedin);
+    formDataApp.append("twitter", formData.twitter);
+
+    if (imageFile) {
+      formDataApp.append("file", imageFile);
     }
-    onClose();
+    dispatch(updateUser(formDataApp));
+    if (!error) {
+      toast.success(message);
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-start md:items-center justify-center p-4">
-      <Card className="bg-white p-2 rounded-md relative top-2 w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] max-h-[90vh] overflow-y-auto">
+      <Card className=" p-2 rounded-md relative top-2 w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-3 border-b dark:border-gray-700">
           <div>
             <CardTitle className="text-xl">Edit Profile</CardTitle>
@@ -76,6 +108,11 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
         </div>
 
         <CardContent className="space-y-4 p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {error && (
+            <div className="p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded text-sm">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="firstName" className="text-sm font-medium">
@@ -86,7 +123,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleInputChange}
-                placeholder="Rohit"
+                placeholder="First Name"
                 className="mt-1"
               />
             </div>
@@ -99,7 +136,7 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleInputChange}
-                placeholder="Singh"
+                placeholder="Last Name"
                 className="mt-1"
               />
             </div>
@@ -152,29 +189,29 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
               />
             </div>
             <div>
-              <Label htmlFor="github" className="text-sm font-medium">
-                Github
+              <Label htmlFor="twitter" className="text-sm font-medium">
+                Twitter
               </Label>
               <Input
-                id="github"
-                name="github"
+                id="twitter"
+                name="twitter"
                 type="url"
-                value={formData.github}
+                value={formData.twitter}
                 onChange={handleInputChange}
-                placeholder="https://github.com/sandeep"
+                placeholder="https://twitter.com/sandeep"
                 className="mt-1"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="description" className="text-sm font-medium">
+            <Label htmlFor=" bio" className="text-sm font-medium">
               Description
             </Label>
             <textarea
-              id="description"
-              name="description"
-              value={formData.description}
+              id="bio"
+              name="bio"
+              value={formData.bio}
               onChange={handleInputChange}
               placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
               className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none"
@@ -186,17 +223,8 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
             <Label htmlFor="picture" className="text-sm font-medium">
               Picture
             </Label>
-            <div className="mt-2">
-              {imagePreview && (
-                <div className="mb-4 flex justify-center">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-24 h-24 rounded-full object-cover"
-                  />
-                </div>
-              )}
-              <label className="flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-4">
+            <div className="mt-2 flex items-start justify-center gap-2">
+              <label className=" w-[50%] flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-4">
                 <input
                   id="picture"
                   name="picture"
@@ -214,6 +242,15 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
                   No file chosen
                 </p>
               )}
+              {imagePreview && (
+                <div className="mb-4 flex justify-center w-[50%]">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -227,10 +264,11 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSave }) => {
             Cancel
           </Button>
           <Button
-            onClick={handleSave}
-            className="bg-black dark:bg-white text-white dark:text-black"
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-black dark:bg-white text-white dark:text-black disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Changes
+            {loading ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </Card>
