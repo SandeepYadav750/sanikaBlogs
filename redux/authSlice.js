@@ -8,7 +8,7 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (userData, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API}/register`, userData, {
+      const res = await axios.post(`${API}/user/register`, userData, {
         withCredentials: true,
       });
       return res.data; // Return the full response data
@@ -25,7 +25,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (userData, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API}/login`, userData, {
+      const res = await axios.post(`${API}/user/login`, userData, {
         withCredentials: true,
       });
       console.log("SUCCESS RESPONSE:", res.data.user); // 👈 ADD THIS
@@ -41,7 +41,7 @@ export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API}/logout`, {
+      const res = await axios.get(`${API}/user/logout`, {
         withCredentials: true,
       });
 
@@ -60,7 +60,7 @@ export const updateUser = createAsyncThunk(
   "auth/updateUser",
   async (userData, { rejectWithValue }) => {
     try {
-      const res = await axios.put(`${API}/profile/update`, userData, {
+      const res = await axios.put(`${API}/user/profile/update`, userData, {
         withCredentials: true,
       });
 

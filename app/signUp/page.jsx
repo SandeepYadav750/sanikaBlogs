@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../../redux/authSlice";
+import { ImSpinner2 } from "react-icons/im";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);

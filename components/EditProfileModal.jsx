@@ -17,7 +17,7 @@ import { updateUser } from "@/redux/authSlice";
 
 const EditProfileModal = ({ isOpen, onClose }) => {
   const { user } = useSelector((state) => state.auth.user);
-  // ✅ FIXED — correct slice name
+  // ✅ FIXED — correct slice nameq
   const { loading, message, error } = useSelector((state) => state.auth, );
   const dispatch = useDispatch();
 
@@ -108,11 +108,6 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         </div>
 
         <CardContent className="space-y-4 p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {error && (
-            <div className="p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded text-sm">
-              {error}
-            </div>
-          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="firstName" className="text-sm font-medium">
@@ -121,7 +116,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
               <Input
                 id="firstName"
                 name="firstName"
-                value={formData.firstName}
+                value={formData.firstName || ""}
                 onChange={handleInputChange}
                 placeholder="First Name"
                 className="mt-1"
@@ -134,7 +129,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
               <Input
                 id="lastName"
                 name="lastName"
-                value={formData.lastName}
+                value={formData.lastName || ""}
                 onChange={handleInputChange}
                 placeholder="Last Name"
                 className="mt-1"
@@ -151,7 +146,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 id="facebook"
                 name="facebook"
                 type="url"
-                value={formData.facebook}
+                value={formData.facebook || ""}
                 onChange={handleInputChange}
                 placeholder="Enter a URL"
                 className="mt-1"
@@ -165,7 +160,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 id="instagram"
                 name="instagram"
                 type="url"
-                value={formData.instagram}
+                value={formData.instagram || ""}
                 onChange={handleInputChange}
                 placeholder="Enter a URL"
                 className="mt-1"
@@ -182,7 +177,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 id="linkedin"
                 name="linkedin"
                 type="url"
-                value={formData.linkedin}
+                value={formData.linkedin || ""}
                 onChange={handleInputChange}
                 placeholder="https://www.linkedin.com"
                 className="mt-1"
@@ -196,7 +191,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 id="twitter"
                 name="twitter"
                 type="url"
-                value={formData.twitter}
+                value={formData.twitter || ""}
                 onChange={handleInputChange}
                 placeholder="https://twitter.com/sandeep"
                 className="mt-1"
@@ -211,7 +206,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
             <textarea
               id="bio"
               name="bio"
-              value={formData.bio}
+              value={formData.bio || ""}
               onChange={handleInputChange}
               placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
               className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none"
