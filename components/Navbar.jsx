@@ -71,47 +71,48 @@ const Navbar = () => {
 
   return (
     <div className="py-4 fixed w-full dark:bg-gray-800 dark:border-b-gray-600 border-b-gray-300 border-b-2 bg-white z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-4 md:px-0">
+      <div className="md:max-w-7xl mx-auto flex justify-between items-center px-4 md:px-0">
         {/* logo section */}
-        <div className="flex gap-7 items-center">
-          <Link href="/">
-            <div className="flex gap-2 items-center">
-              <Image
-                src="/logo.png"
-                alt="logo"
-                className="w-7 h-7 md:w-10 md:h-10 dark:invert"
-                width={20}
-                height={20}
-              />
-              <h1 className="px-3 py-1 rounded-md font-bold text-3xl md:text-4xl">
-                Logos
-              </h1>
-            </div>
-          </Link>
-          <div className="relative hidden md:block">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="text-2xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+        >
+          Logo
+        </Link>
+
+        {/* Search Bar */}
+        <div className="flex-1 max-w-md mx-8">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               type="text"
-              placeholder="Search"
-              className="border border-gray-700 dark:bg-gray-900 bg-gray-300 w-75 hidden md:block"
+              placeholder="Search..."
+              className="pl-10 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
             />
-            <Button className="absolute right-0 top-0">
-              <Search className="w-4 h-4 pointer-cursor" />
-            </Button>
           </div>
         </div>
-        {/* nav section */}
-        <nav className="flex md:gap-7 gap-4 items-center">
-          <ul className="hidden md:flex gap-7 items-center text-xl font-semibold">
-            <Link href="/" className={linkClass("/")}>
-              Home
-            </Link>
-            <Link href="/blogs" className={linkClass("/blogs")}>
-              Blogs
-            </Link>
-            <Link href="/about" className={linkClass("/about")}>
-              About
-            </Link>
-          </ul>
+
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          <Link
+            href="/"
+            className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          >
+            Home
+          </Link>
+          <Link
+            href="/dashboard/blogs"
+            className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          >
+            Blogs
+          </Link>
+          <Link
+            href="/about"
+            className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          >
+            About
+          </Link>
           <div className="flex">
             <Button className="" onClick={() => dispatch(toggleTheme())}>
               {theme === "light" ? <FaMoon /> : <FaSun />}
@@ -125,7 +126,9 @@ const Navbar = () => {
                   >
                     <Avatar>
                       <AvatarImage
-                        src={user.user?.photoURL || "https://github.com/shadcn.png"}
+                        src={
+                          user.user?.photoURL || "https://github.com/shadcn.png"
+                        }
                         alt="Avatar"
                       />
                       <AvatarFallback>SY</AvatarFallback>
@@ -198,11 +201,11 @@ const Navbar = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       {/* <Button > */}
-                        <DropdownMenuItem onClick={logoutHandler}>
-                          <FiLogOut />
-                          Logout
-                          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                        </DropdownMenuItem>
+                      <DropdownMenuItem onClick={logoutHandler}>
+                        <FiLogOut />
+                        Logout
+                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                      </DropdownMenuItem>
                       {/* </Button> */}
                     </DropdownMenuGroup>
                   </DropdownMenuContent>

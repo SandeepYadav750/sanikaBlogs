@@ -103,13 +103,13 @@ const BlogList = () => {
 
   // Handle view blog
   const handleViewBlog = (blogId) => {
-    router.push(`/dashboard/blogs/${blogId}`);
+    router.push(`/blog/${blogId}`);
   };
 
   // Loading state
   if (loading && (!blogs || blogs.length === 0)) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex justify-center items-center min-h-[60vh] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center transform transition-all duration-500">
           <div className="relative">
             <ImSpinner2 className="animate-spin text-5xl mx-auto mb-6 text-indigo-600 dark:text-indigo-400" />
@@ -128,7 +128,7 @@ const BlogList = () => {
   // Error state
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex justify-center items-center min-h-[60vh] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center max-w-md mx-auto px-6">
           <div className="bg-red-100 dark:bg-red-900/20 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
             <svg
@@ -163,9 +163,9 @@ const BlogList = () => {
   // Empty state
   if (!blogs || blogs.length === 0) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex justify-center items-center min-h-[60vh] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center max-w-md mx-auto px-6">
-          <div className="bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-full p-6 w-32 h-32 mx-auto mb-8 flex items-center justify-center">
+          <div className="bg-linear-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-full p-6 w-32 h-32 mx-auto mb-8 flex items-center justify-center">
             <svg
               className="w-16 h-16 text-indigo-600 dark:text-indigo-400"
               fill="none"
@@ -189,7 +189,7 @@ const BlogList = () => {
           </p>
           <Button
             onClick={() => router.push("/dashboard/write-blog")}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             Create Your First Blog
           </Button>
@@ -199,12 +199,12 @@ const BlogList = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div className="space-y-1">
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
               Blog Management
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
@@ -213,7 +213,7 @@ const BlogList = () => {
           </div>
           <Button
             onClick={() => router.push("/dashboard/write-blog")}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -332,7 +332,7 @@ const BlogList = () => {
                 className="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
               >
                 <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {blog?.thumbnail || blog?.coverImage ? (
                       <Image
                         src={blog?.thumbnail || blog?.coverImage}
@@ -343,7 +343,7 @@ const BlogList = () => {
                         unoptimized={true}
                       />
                     ) : (
-                      <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                      <div className="h-16 w-16 rounded-lg bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
                         <svg
                           className="w-8 h-8 text-gray-400"
                           fill="none"
@@ -458,7 +458,7 @@ const BlogList = () => {
                           {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all duration-300"></div> */}
                         </div>
                       ) : (
-                        <div className="h-12 w-20 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                        <div className="h-12 w-20 rounded-lg bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
                           <svg
                             className="w-6 h-6 text-gray-400"
                             fill="none"
@@ -559,7 +559,7 @@ const BlogList = () => {
             <AlertDialogAction
               onClick={confirmDelete}
               disabled={isDeleting}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
+              className="bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
             >
               {isDeleting ? (
                 <>
