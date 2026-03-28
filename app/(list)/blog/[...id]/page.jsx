@@ -3,7 +3,6 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import {
@@ -15,7 +14,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
-  Search,
   Heart,
   Share2,
   Bookmark,
@@ -23,47 +21,86 @@ import {
   ArrowLeft,
   Eye,
   ThumbsUp,
-  ChevronRight,
   Facebook,
   Twitter,
   Linkedin,
   Link as LinkIcon,
   Clock,
   Calendar,
-  Tag,
-  User,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { fetchAllBlogs } from "@/redux/blogSlice";
+import {
+  fetchAllBlogs,
+  fetchUserLikedBlogs,
+  toggleLikeBlog,
+} from "@/redux/blogSlice";
 
 const SingleBlog = () => {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
-  const id = params.id;
+  const id = params?.id;
 
-  const { blogs, loading } = useSelector((store) => store.blog);
+  // Safely access Redux state with fallbacks
+  const {blogs = [], likedBlogs = [], loading = false, } = useSelector((store) => store.blog || {});
+  const { user } = useSelector((state) => state.auth.user || {});
+
   const [selectedBlog, setSelectedBlog] = useState(null);
-  const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [liked, setLiked] = useState(false);
+  const [blogLikeCount, setBlogLikeCount] = useState(0);
+  // const [isLiking, setIsLiking] = useState(false);
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  // Find blog
+  // console.log("blogs", blogs);
+  // console.log("likedBlogs", likedBlogs);
+  // console.log("selectedBlog", selectedBlog);
+  // console.log("blogLikeCount", blogLikeCount);
+
+  // Fetch blogs and user's liked blogs on mount
   useEffect(() => {
-    if (blogs && blogs.length > 0) {
-      const blog = blogs.find((b) => String(b._id) === String(id));
-      setSelectedBlog(blog);
-    } else {
-      dispatch(fetchAllBlogs());
+    if (!initialFetchDone) {
+      const fetchData = async () => {
+        try {
+          await dispatch(fetchAllBlogs()).unwrap();
+          if (user) {
+            await dispatch(fetchUserLikedBlogs()).unwrap();
+          }
+        } catch (error) {
+          console.error("Error fetching initial data:", error);
+        } finally {
+          setInitialFetchDone(true);
+        }
+      };
+
+      fetchData();
     }
-  }, [blogs, id, dispatch]);
+  }, [dispatch, user, initialFetchDone]);
+
+  // Find blog and fetch liked status
+  useEffect(() => {
+    if (blogs && blogs.length > 0 && id) {
+      const blog = blogs.find((b) => String(b?._id) === String(id));
+      setSelectedBlog(blog || null);
+    }
+  }, [blogs, id]);
+
+  // Update liked state based on likedBlogs from Redux
+  useEffect(() => {
+    if (selectedBlog && user && likedBlogs && Array.isArray(likedBlogs)) {
+      const hasLiked = likedBlogs.includes(selectedBlog._id);
+      setLiked(hasLiked);
+      setBlogLikeCount(selectedBlog.likes?.length || 0);
+      // setBlogLikeCount(likedBlogs?.length || 0);
+    }
+  }, [selectedBlog, user, likedBlogs]);
 
   // Calculate reading time
   const getReadingTime = (content) => {
@@ -87,13 +124,59 @@ const SingleBlog = () => {
 
   // Get author initials
   const getInitials = (name) => {
-    if (!name) return "Sy";
+    if (!name) return "SY";
     return name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  // Handle like/dislike
+  const likeDislike = async () => {
+    if (!selectedBlog || !user) {
+      toast.error("Please login to like this blog");
+      alert(router.push("/login"))
+      return;
+    }
+
+    if (loading) return;
+
+    const action = liked ? "dislike" : "like";
+    try {
+      const result = await dispatch(
+        toggleLikeBlog({
+          blogId: selectedBlog._id,
+          action,
+        }),
+      ).unwrap();
+
+      // Update local state optimistically
+      const updatedLikeCount = liked ? blogLikeCount - 1 : blogLikeCount + 1;
+      setBlogLikeCount(updatedLikeCount);
+      setLiked(!liked);
+
+      // Update selectedBlog state
+      setSelectedBlog((prev) => {
+        if (!prev) return prev;
+        const updatedLikes = liked
+          ? (prev.likes || []).filter((id) => id !== user._id)
+          : [...(prev.likes || []), user._id];
+        return {
+          ...prev,
+          likes: updatedLikes,
+        };
+      });
+
+      toast.success(
+        result.message ||
+          `Blog ${action === "like" ? "liked" : "unliked"} successfully`,
+      );
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast.error(error || "Error liking blog. Please try again.");
+    }
   };
 
   // Share functionality
@@ -130,7 +213,7 @@ const SingleBlog = () => {
       const newComment = {
         id: Date.now(),
         text: comment,
-        author: "Current User",
+        author: user?.firstName + " " + user?.lastName || "Current User",
         date: new Date().toISOString(),
         likes: 0,
       };
@@ -140,11 +223,12 @@ const SingleBlog = () => {
     }
   };
 
-  if (loading && !selectedBlog) {
+  // Show loading state
+  if ((loading || !initialFetchDone) && !selectedBlog) {
     return (
       <div className="min-h-screen bg-gray-200 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <Loader2 className="animate-spin h-12 w-12 text-indigo-600 mx-auto" />
           <p className="mt-4 text-gray-600 dark:text-gray-300">
             Loading blog post...
           </p>
@@ -153,7 +237,8 @@ const SingleBlog = () => {
     );
   }
 
-  if (!selectedBlog) {
+  // Show not found state
+  if (!loading && initialFetchDone && !selectedBlog) {
     return (
       <div className="min-h-screen bg-gray-200 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
@@ -190,33 +275,34 @@ const SingleBlog = () => {
     );
   }
 
+  if (!selectedBlog) {
+    return null;
+  }
+
   return (
     <div className="bg-gray-200 min-h-screen dark:bg-gray-900 pb-2">
       <div className="bg-white dark:bg-gray-900 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 rounded-lg">
         {/* Breadcrumb */}
-        <div className=" pb-4 border-b border-gray-200">
+        <div className="pb-4 border-b border-gray-200">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink href="/">Home</BreadcrumbLink>
               </BreadcrumbItem>
-
               <BreadcrumbSeparator />
-
               <BreadcrumbItem>
                 <BreadcrumbLink href="/dashboard/blogs">Blogs</BreadcrumbLink>
               </BreadcrumbItem>
-
               <BreadcrumbSeparator />
-
               <BreadcrumbItem>
                 <BreadcrumbPage>{selectedBlog?.title}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
+
         {/* Main Content */}
-        <div className="pt-4 ">
+        <div className="pt-4">
           {/* Blog Header */}
           <div className="mb-8">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
@@ -230,15 +316,16 @@ const SingleBlog = () => {
                   <AvatarImage src={selectedBlog.author?.photoURL} />
                   <AvatarFallback className="bg-linear-to-r from-indigo-500 to-purple-500 text-white">
                     {getInitials(
-                      selectedBlog.author?.firstName +
-                        selectedBlog.author?.lastName || "SY",
+                      (selectedBlog.author?.firstName || "") +
+                        (selectedBlog.author?.lastName || ""),
                     )}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
                     {selectedBlog.author?.firstName +
-                      selectedBlog.author?.lastName || "Sandeep Yadav ji"}
+                      " " +
+                      selectedBlog.author?.lastName || "Anonymous Author"}
                   </p>
                   <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                     <span className="flex items-center gap-1">
@@ -258,17 +345,18 @@ const SingleBlog = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setLiked(!liked)}
+                  onClick={likeDislike}
+                  disabled={loading}
                   className={`gap-2 ${liked ? "text-red-600" : ""}`}
                 >
-                  <Heart className={`w-4 h-4 ${liked ? "fill-current" : ""}`} />
-                  <span>
-                    {liked
-                      ? selectedBlog.likes
-                        ? selectedBlog.likes + 1
-                        : 1
-                      : selectedBlog.likes || 0}
-                  </span>
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Heart
+                      className={`w-4 h-4 ${liked ? "fill-current" : ""}`}
+                    />
+                  )}
+                  <span>{blogLikeCount}</span>
                 </Button>
 
                 <Button
@@ -350,58 +438,47 @@ const SingleBlog = () => {
 
           {/* Blog Content */}
           <article className="prose prose-lg dark:prose-invert max-w-none">
-            {/* Introduction/Description */}
-            {/* {selectedBlog.content && (
-            <div className="mb-8 pb-8 border-b border-gray-200 dark:border-gray-800">
-              <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
-                {selectedBlog.content}
-              </p>
-            </div>
-          )} */}
-
-            {/* Main Content */}
             <div className="text-gray-700 dark:text-gray-300 leading-relaxed space-y-6">
               {selectedBlog.description ? (
                 <div
                   dangerouslySetInnerHTML={{ __html: selectedBlog.description }}
                 />
               ) : (
-                <>
-                  <p>Content Coming Soon...</p>
-                </>
+                <p>Content Coming Soon...</p>
               )}
             </div>
 
             {/* Tags Section */}
-            {/* {selectedBlog.tags && selectedBlog.tags.length > 0 && ( */}
             <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
               <div className="flex flex-wrap gap-2">
-                {/* {selectedBlog.tags.map((tag, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                  >
-                    {tag}
-                  </Badge>
-                ))} */}
-                <Badge
-                  key="0"
-                  variant="secondary"
-                  className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                >
-                  Nextjs
-                </Badge>
-                <Badge
-                  key="1"
-                  variant="secondary"
-                  className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                >
-                  Reactjs
-                </Badge>
+                {selectedBlog.tags && selectedBlog.tags.length > 0 ? (
+                  selectedBlog.tags.map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    >
+                      {tag}
+                    </Badge>
+                  ))
+                ) : (
+                  <>
+                    <Badge
+                      variant="secondary"
+                      className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    >
+                      Nextjs
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    >
+                      Reactjs
+                    </Badge>
+                  </>
+                )}
               </div>
             </div>
-            {/* )} */}
           </article>
 
           {/* Engagement Section */}
@@ -410,11 +487,16 @@ const SingleBlog = () => {
               <div className="flex items-center gap-4">
                 <Button
                   variant="outline"
-                  onClick={() => setLiked(!liked)}
+                  onClick={likeDislike}
+                  disabled={loading}
                   className={`gap-2 ${liked ? "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800" : ""}`}
                 >
-                  <ThumbsUp className="w-4 h-4" />
-                  Like
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <ThumbsUp className="w-4 h-4" />
+                  )}
+                  {liked ? "Liked" : "Like"}
                 </Button>
                 <Button
                   variant="outline"
@@ -445,12 +527,15 @@ const SingleBlog = () => {
               {comments.length} Comments
             </h3>
 
-            {/* Comment Form */}
             <form onSubmit={handleCommentSubmit} className="mb-8">
               <div className="flex gap-4">
                 <Avatar className="h-10 w-10 shrink-0">
                   <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                    U
+                    {user
+                      ? getInitials(
+                          (user.firstName || "") + (user.lastName || ""),
+                        )
+                      : "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -470,7 +555,6 @@ const SingleBlog = () => {
               </div>
             </form>
 
-            {/* Comments List */}
             <div className="space-y-6">
               {comments.length === 0 ? (
                 <p className="text-center text-gray-500 dark:text-gray-400 py-8">

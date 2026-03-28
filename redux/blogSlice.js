@@ -22,18 +22,38 @@ export const fetchAllBlogs = createAsyncThunk(
   },
 );
 
+// 🔥 Fetch User's Liked Blogs
+export const fetchUserLikedBlogs = createAsyncThunk(
+  "blog/fetchUserLikedBlogs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API}/blog/my-blogs/likes`, {
+        withCredentials: true,
+      });
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch liked blogs",
+      );
+    }
+  },
+);
+// ==========================
 // 🔥 Create Blog
+// ==========================
 export const createBlog = createAsyncThunk(
   "blog/createBlog",
   async (userBlog, { rejectWithValue }) => {
     try {
       const res = await axios.post(`${API}/blog`, userBlog, {
         headers: {
-          "Content-Type": "multipart/form-data", // For file updates
+          "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
       });
-      return res.data; // Return the full response data
+      return res.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Blog Creating Failed",
@@ -51,9 +71,9 @@ export const updateBlog = createAsyncThunk(
     try {
       const res = await axios.put(`${API}/blog/update/${id}`, data, {
         headers: {
-          "Content-Type": "multipart/form-data", // For file updates
+          "Content-Type": "multipart/form-data",
         },
-        withCredentials: true, // FormData hai, headers mat lagao
+        withCredentials: true,
       });
       return res.data;
     } catch (error) {
@@ -86,21 +106,45 @@ export const deleteBlog = createAsyncThunk(
 );
 
 // ==========================
+// 🔥 LIKE/DISLIKE BLOG
+// ==========================
+export const toggleLikeBlog = createAsyncThunk(
+  "blog/toggleLikeBlog",
+  async ({ blogId, action }, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API}/blog/${blogId}/${action}`, {
+        withCredentials: true,
+      });
+      return {
+        blogId,
+        action,
+        data: res.data,
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to toggle like"
+      );
+    }
+  }
+);
+
+// ==========================
 // 🔥 INITIAL STATE
 // ==========================
 const initialState = {
-  blogs: [],
+  blogs: [], // Initialize as empty array
   blog: null,
+  likedBlogs: [], // Initialize as empty array
   loading: false,
   message: null,
   error: null,
+  isAuthenticated: false,
 };
 
 const blogSlice = createSlice({
   name: "blog",
   initialState,
   reducers: {
-    // optional reset
     clearMessage: (state) => {
       state.message = null;
       state.error = null;
@@ -118,12 +162,35 @@ const blogSlice = createSlice({
       })
       .addCase(fetchAllBlogs.fulfilled, (state, action) => {
         state.loading = false;
-        state.blogs = action.payload.blogs || action.payload;
+        // Handle different response structures
+        const blogsData = action.payload.blogs || action.payload;
+        state.blogs = Array.isArray(blogsData) ? blogsData : [];
         state.error = null;
       })
       .addCase(fetchAllBlogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.blogs = []; // Reset to empty array on error
+      })
+
+      // ==========================
+      // FETCH USER LIKED BLOGS
+      // ==========================
+      .addCase(fetchUserLikedBlogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserLikedBlogs.fulfilled, (state, action) => {
+        state.loading = false;
+        // Handle different response structures
+        const likedData = action.payload.likedBlogs || action.payload;
+        state.likedBlogs = Array.isArray(likedData) ? likedData : [];
+        state.error = null;
+      })
+      .addCase(fetchUserLikedBlogs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.likedBlogs = []; // Reset to empty array on error
       })
 
       // ==========================
@@ -136,9 +203,11 @@ const blogSlice = createSlice({
       .addCase(createBlog.fulfilled, (state, action) => {
         state.loading = false;
         state.blog = action.payload.blog;
-        state.blogs.push(action.payload.blog); // list update
+        if (action.payload.blog) {
+          state.blogs = [action.payload.blog, ...state.blogs];
+        }
         state.isAuthenticated = true;
-        state.message = action.payload.message; // 👈 success message
+        state.message = action.payload.message;
       })
       .addCase(createBlog.rejected, (state, action) => {
         state.loading = false;
@@ -158,19 +227,19 @@ const blogSlice = createSlice({
         state.error = null;
 
         const updatedBlog = action.payload.blog;
-        // ✅ Update the single blog state
         state.blog = updatedBlog;
-        // ✅ Update the existing blog in the blogs array (not add new)
-        const index = state.blogs.findIndex(
-          (item) => item._id === updatedBlog._id,
-        );
-        if (index !== -1) {
-          // Replace the existing blog at the found index
-          state.blogs[index] = updatedBlog;
+        
+        if (updatedBlog && Array.isArray(state.blogs)) {
+          const index = state.blogs.findIndex(
+            (item) => item?._id === updatedBlog?._id,
+          );
+          if (index !== -1) {
+            state.blogs[index] = updatedBlog;
+          }
         }
 
         state.isAuthenticated = true;
-        state.message = action.payload.message; // 👈 success message
+        state.message = action.payload.message;
       })
       .addCase(updateBlog.rejected, (state, action) => {
         state.loading = false;
@@ -180,24 +249,86 @@ const blogSlice = createSlice({
       // ==========================
       // DELETE BLOG
       // ==========================
-
       .addCase(deleteBlog.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(deleteBlog.fulfilled, (state, action) => {
         state.loading = false;
-        // Remove deleted blog from the list
-        state.blogs = state.blogs.filter(
-          (blog) => blog._id !== action.payload.id,
-        );
-        // Clear single blog if it was deleted
-        if (state.blog?._id === action.payload.id) {
+        if (Array.isArray(state.blogs)) {
+          state.blogs = state.blogs.filter(
+            (blog) => blog?._id !== action.payload?.id,
+          );
+        }
+        if (state.blog?._id === action.payload?.id) {
           state.blog = null;
         }
-        state.message = action.payload.message;
+        state.message = action.payload?.message;
       })
       .addCase(deleteBlog.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ==========================
+      // TOGGLE LIKE/DISLIKE BLOG
+      // ==========================
+      .addCase(toggleLikeBlog.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleLikeBlog.fulfilled, (state, action) => {
+        state.loading = false;
+        const { blogId, action: likeAction, data } = action.payload;
+        
+        // Update likedBlogs array
+        if (likeAction === 'like') {
+          if (!state.likedBlogs.includes(blogId)) {
+            state.likedBlogs.push(blogId);
+          }
+        } else {
+          state.likedBlogs = state.likedBlogs.filter(id => id !== blogId);
+        }
+        
+        // Update the blog in the blogs array
+        if (Array.isArray(state.blogs)) {
+          const blogIndex = state.blogs.findIndex(blog => blog?._id === blogId);
+          if (blogIndex !== -1) {
+            const blog = state.blogs[blogIndex];
+            const userId = data?.userId;
+            
+            if (userId) {
+              if (likeAction === 'like') {
+                if (!blog.likes?.includes(userId)) {
+                  blog.likes = [...(blog.likes || []), userId];
+                }
+              } else {
+                blog.likes = (blog.likes || []).filter(id => id !== userId);
+              }
+              
+              state.blogs[blogIndex] = { ...blog };
+            }
+          }
+        }
+        
+        // Update single blog if it's the same
+        if (state.blog && state.blog._id === blogId) {
+          const userId = data?.userId;
+          if (userId) {
+            if (likeAction === 'like') {
+              if (!state.blog.likes?.includes(userId)) {
+                state.blog.likes = [...(state.blog.likes || []), userId];
+              }
+            } else {
+              state.blog.likes = (state.blog.likes || []).filter(id => id !== userId);
+            }
+            state.blog = { ...state.blog };
+          }
+        }
+        
+        state.message = data?.message;
+      })
+      .addCase(toggleLikeBlog.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

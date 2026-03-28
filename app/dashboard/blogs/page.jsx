@@ -83,9 +83,9 @@ const BlogList = () => {
       if (deleteBlog.fulfilled.match(result)) {
         toast.success(message);
         // Refresh the blog list
-        // await dispatch(fetchAllBlogs());
+        await dispatch(fetchAllBlogs());
       } else {
-        toast.error(error || "Faidelete blog");
+        toast.error(error || "blog deleted");
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -541,7 +541,7 @@ const BlogList = () => {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
               <FiTrash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
-            <AlertDialogTitle className="text-center text-xl font-bold text-gray-900 dark:text-white">
+            <AlertDialogTitle className="w-full text-center text-xl font-bold text-gray-900 dark:text-white">
               Delete Blog Post
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-gray-600 dark:text-gray-300">

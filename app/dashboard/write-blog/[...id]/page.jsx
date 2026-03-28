@@ -40,9 +40,6 @@ const blogId = () => {
   );
   // Solution: Convert both to string for comparison
   const selectBlogData = blogs.find((blog) => String(blog._id) === String(id));
-  // console.log("blog", blog);
-  // console.log("blogs", blogs);
-  // console.log("selectBlogData", selectBlogData);
 
   const [formData, setFormData] = useState({
     title: selectBlogData?.title,
@@ -88,7 +85,7 @@ const blogId = () => {
 
       if (!error) {
         toast.success(message);
-        router.push(`/dashboard/blogs/${id}`);
+        router.push(`/blog/${id}`);
       } else {
         toast.error(error);
       }

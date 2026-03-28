@@ -31,7 +31,6 @@ import {
   ArrowLeft,
   Eye,
   ThumbsUp,
-  ChevronRight,
   Facebook,
   Twitter,
   Linkedin,
@@ -47,6 +46,7 @@ const SingleBlog = () => {
 
   const { blogs, loading } = useSelector((store) => store.blog);
   const [selectedBlog, setSelectedBlog] = useState(null);
+  console.log("selectedBlog", selectedBlog);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
