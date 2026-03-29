@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import "react-toastify/dist/ReactToastify.css";
 import Provider from "./provider";
 import ThemeProvider from "../components/ThemeProviders";
+import Footer from "../components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,8 @@ export default function RootLayout({ children }) {
           <ThemeProvider>
             <Navbar />
             <div className="pt-20">{children}</div>
-            </ThemeProvider>
+            <Footer />
+          </ThemeProvider>
         </Provider>
       </body>
     </html>
