@@ -47,13 +47,10 @@ export const logoutUser = createAsyncThunk(
 
       return res.data; // { success, message }
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Logout failed"
-      );
+      return rejectWithValue(error.response?.data?.message || "Logout failed");
     }
-  }
+  },
 );
-
 
 // 🔥 Update User THUNK
 export const updateUser = createAsyncThunk(
@@ -66,14 +63,27 @@ export const updateUser = createAsyncThunk(
 
       return res.data; // { success, message }
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Update failed"
-      );
+      return rejectWithValue(error.response?.data?.message || "Update failed");
     }
-  }
+  },
 );
 
-
+// 🔥 getAllUsers
+export const getAllUsers = createAsyncThunk(
+  "auth/getAllUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API}/user/all-users`, {
+        withCredentials: true,
+      });
+      return res.data; // Return the full response data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "All Users fetch failed ",
+      );
+    }
+  },
+);
 
 // 🧠 SLICE
 const authSlice = createSlice({
@@ -81,6 +91,7 @@ const authSlice = createSlice({
   initialState: {
     loading: false,
     user: null,
+    allUsers: null,
     isAuthenticated: false,
     message: null, // 👈 ADD THIS
     error: null,
@@ -92,9 +103,9 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
     },
 
-  setUser: (state, action) => {
-    state.user = action.payload;
-  },
+    setUser: (state, action) => {
+      state.user = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -129,8 +140,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-    
-    // 🔥 LOGOUT
+
+      // 🔥 LOGOUT
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -145,8 +156,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-    
-    // UPDATE USER
+
+      // UPDATE USER
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -161,7 +172,22 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-    
+
+      // REGISTER
+      .addCase(getAllUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allUsers = action.payload; // 👈 Store all users
+        state.isAuthenticated = true;
+        state.message = action.payload.message; // 👈 success message
+      })
+      .addCase(getAllUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
