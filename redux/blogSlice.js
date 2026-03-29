@@ -122,11 +122,52 @@ export const toggleLikeBlog = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to toggle like"
+        error.response?.data?.message || "Failed to toggle like",
       );
     }
-  }
+  },
 );
+
+export const fetchPublishedBlogs = createAsyncThunk(
+  "blog/fetchPublishedBlogs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API}/blog/get-published-blogs`, {
+        withCredentials: true,
+      });
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch published blogs",
+      );
+    }
+  },
+);
+
+export const togglePublishBlog = createAsyncThunk(
+  "blog/togglePublishBlog",
+  async (blogId, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `${API}/blog/${blogId}`,
+        {},
+        { withCredentials: true },
+      );
+      console.log("res.data", res.data);
+      return { blogId, data: res.data };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Publish toggle failed",
+      );
+    }
+  },
+);
+
+const filterPublishedBlogs = (blogs) => {
+  return Array.isArray(blogs) ? blogs.filter((blog) => blog?.isPublished) : [];
+};
+export const selectPublishedBlogs = (state) =>
+  state.blog.blogs.filter((b) => b.isPublished);
 
 // ==========================
 // 🔥 INITIAL STATE
@@ -135,6 +176,7 @@ const initialState = {
   blogs: [], // Initialize as empty array
   blog: null,
   likedBlogs: [], // Initialize as empty array
+  publishedBlogs: [], // ✅ NEW STATE
   loading: false,
   message: null,
   error: null,
@@ -165,6 +207,10 @@ const blogSlice = createSlice({
         // Handle different response structures
         const blogsData = action.payload.blogs || action.payload;
         state.blogs = Array.isArray(blogsData) ? blogsData : [];
+
+        // ✅ auto set
+        state.publishedBlogs = filterPublishedBlogs(state.blogs);
+
         state.error = null;
       })
       .addCase(fetchAllBlogs.rejected, (state, action) => {
@@ -206,6 +252,10 @@ const blogSlice = createSlice({
         if (action.payload.blog) {
           state.blogs = [action.payload.blog, ...state.blogs];
         }
+
+        // ✅ auto set
+        state.publishedBlogs = filterPublishedBlogs(state.blogs);
+
         state.isAuthenticated = true;
         state.message = action.payload.message;
       })
@@ -228,7 +278,7 @@ const blogSlice = createSlice({
 
         const updatedBlog = action.payload.blog;
         state.blog = updatedBlog;
-        
+
         if (updatedBlog && Array.isArray(state.blogs)) {
           const index = state.blogs.findIndex(
             (item) => item?._id === updatedBlog?._id,
@@ -237,6 +287,9 @@ const blogSlice = createSlice({
             state.blogs[index] = updatedBlog;
           }
         }
+
+        // ✅ auto set
+        state.publishedBlogs = filterPublishedBlogs(state.blogs);
 
         state.isAuthenticated = true;
         state.message = action.payload.message;
@@ -263,6 +316,10 @@ const blogSlice = createSlice({
         if (state.blog?._id === action.payload?.id) {
           state.blog = null;
         }
+
+        // ✅ auto set
+        state.publishedBlogs = filterPublishedBlogs(state.blogs);
+
         state.message = action.payload?.message;
       })
       .addCase(deleteBlog.rejected, (state, action) => {
@@ -280,57 +337,125 @@ const blogSlice = createSlice({
       .addCase(toggleLikeBlog.fulfilled, (state, action) => {
         state.loading = false;
         const { blogId, action: likeAction, data } = action.payload;
-        
+
         // Update likedBlogs array
-        if (likeAction === 'like') {
+        if (likeAction === "like") {
           if (!state.likedBlogs.includes(blogId)) {
             state.likedBlogs.push(blogId);
           }
         } else {
-          state.likedBlogs = state.likedBlogs.filter(id => id !== blogId);
+          state.likedBlogs = state.likedBlogs.filter((id) => id !== blogId);
         }
-        
+
         // Update the blog in the blogs array
         if (Array.isArray(state.blogs)) {
-          const blogIndex = state.blogs.findIndex(blog => blog?._id === blogId);
+          const blogIndex = state.blogs.findIndex(
+            (blog) => blog?._id === blogId,
+          );
           if (blogIndex !== -1) {
             const blog = state.blogs[blogIndex];
             const userId = data?.userId;
-            
+
             if (userId) {
-              if (likeAction === 'like') {
+              if (likeAction === "like") {
                 if (!blog.likes?.includes(userId)) {
                   blog.likes = [...(blog.likes || []), userId];
                 }
               } else {
-                blog.likes = (blog.likes || []).filter(id => id !== userId);
+                blog.likes = (blog.likes || []).filter((id) => id !== userId);
               }
-              
+
               state.blogs[blogIndex] = { ...blog };
             }
           }
         }
-        
+
         // Update single blog if it's the same
         if (state.blog && state.blog._id === blogId) {
           const userId = data?.userId;
           if (userId) {
-            if (likeAction === 'like') {
+            if (likeAction === "like") {
               if (!state.blog.likes?.includes(userId)) {
                 state.blog.likes = [...(state.blog.likes || []), userId];
               }
             } else {
-              state.blog.likes = (state.blog.likes || []).filter(id => id !== userId);
+              state.blog.likes = (state.blog.likes || []).filter(
+                (id) => id !== userId,
+              );
             }
             state.blog = { ...state.blog };
           }
         }
-        
+
         state.message = data?.message;
       })
       .addCase(toggleLikeBlog.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // ==========================
+      // FETCH PUBLISHED BLOGS
+      // ==========================
+      .addCase(fetchPublishedBlogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPublishedBlogs.fulfilled, (state, action) => {
+        state.loading = false;
+
+        const publishedData = action.payload.publishedBlogs || action.payload;
+
+        state.publishedBlogs = Array.isArray(publishedData)
+          ? publishedData
+          : [];
+
+        state.error = null;
+      })
+      .addCase(fetchPublishedBlogs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.publishedBlogs = [];
+      })
+
+      // toggle
+      .addCase(togglePublishBlog.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(togglePublishBlog.fulfilled, (state, action) => {
+        const { blogId, data } = action.payload;
+        const updatedBlog = data.blog;
+
+        if (!updatedBlog) return;
+
+        // update main list
+        const index = state.blogs.findIndex((b) => b._id === blogId);
+
+        if (index !== -1) {
+          state.blogs[index] = updatedBlog;
+        }
+
+        // // update published list
+        // if (updatedBlog.isPublished) {
+        //   const exists = state.publishedBlogs.find((b) => b._id === blogId);
+        //   if (!exists) {
+        //     state.publishedBlogs.unshift(updatedBlog);
+        //   }
+        // } else {
+        //   state.publishedBlogs = state.publishedBlogs.filter(
+        //     (b) => b._id !== blogId,
+        //   );
+        // }
+
+        // ✅ auto set
+        state.publishedBlogs = filterPublishedBlogs(state.blogs);
+
+        state.message = data.message;
+      })
+      .addCase(togglePublishBlog.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.publishedBlogs = [];
       });
   },
 });

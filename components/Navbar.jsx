@@ -102,7 +102,7 @@ const Navbar = () => {
             Home
           </Link>
           <Link
-            href="/dashboard/blogs"
+            href="/blogs"
             className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
             Blogs
