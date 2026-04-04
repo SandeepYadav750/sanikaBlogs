@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import CommentBox from "@/components/CommentBox";
 import {
   fetchAllBlogs,
   fetchUserLikedBlogs,
@@ -46,14 +47,16 @@ const SingleBlog = () => {
   const id = params?.id;
 
   // Safely access Redux state with fallbacks
-  const {blogs = [], likedBlogs = [], loading = false, } = useSelector((store) => store.blog || {});
+  const {
+    blogs = [],
+    likedBlogs = [],
+    loading = false,
+  } = useSelector((store) => store.blog || {});
   const { user } = useSelector((state) => state.auth.user || {});
 
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [saved, setSaved] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
-  const [comment, setComment] = useState("");
-  const [comments, setComments] = useState([]);
   const [liked, setLiked] = useState(false);
   const [blogLikeCount, setBlogLikeCount] = useState(0);
   // const [isLiking, setIsLiking] = useState(false);
@@ -137,7 +140,7 @@ const SingleBlog = () => {
   const likeDislike = async () => {
     if (!selectedBlog || !user) {
       toast.error("Please login to like this blog");
-      alert(router.push("/login"))
+      alert(router.push("/login"));
       return;
     }
 
@@ -204,23 +207,6 @@ const SingleBlog = () => {
     }
     window.open(shareUrl, "_blank", "width=600,height=400");
     setShowShareMenu(false);
-  };
-
-  // Handle comment submit
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (comment.trim()) {
-      const newComment = {
-        id: Date.now(),
-        text: comment,
-        author: user?.firstName + " " + user?.lastName || "Current User",
-        date: new Date().toISOString(),
-        likes: 0,
-      };
-      setComments([...comments, newComment]);
-      setComment("");
-      toast.success("Comment added successfully!");
-    }
   };
 
   // Show loading state
@@ -482,7 +468,7 @@ const SingleBlog = () => {
           </article>
 
           {/* Engagement Section */}
-          <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+          <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
                 <Button
@@ -519,78 +505,10 @@ const SingleBlog = () => {
           </div>
 
           {/* Comments Section */}
-          <div
-            id="comment-section"
-            className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800"
-          >
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {comments.length} Comments
-            </h3>
-
-            <form onSubmit={handleCommentSubmit} className="mb-8">
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 shrink-0">
-                  <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                    {user
-                      ? getInitials(
-                          (user.firstName || "") + (user.lastName || ""),
-                        )
-                      : "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Write a comment..."
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    rows="3"
-                  />
-                  <div className="mt-2 flex justify-end">
-                    <Button type="submit" disabled={!comment.trim()}>
-                      Post Comment
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </form>
-
-            <div className="space-y-6">
-              {comments.length === 0 ? (
-                <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  No comments yet. Be the first to share your thoughts!
-                </p>
-              ) : (
-                comments.map((comment) => (
-                  <div key={comment.id} className="flex gap-4">
-                    <Avatar className="h-10 w-10 shrink-0">
-                      <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                        {comment.author.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-gray-900 dark:text-white">
-                            {comment.author}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {formatDate(comment.date)}
-                          </span>
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300">
-                          {comment.text}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          <CommentBox blogId={selectedBlog._id} />
 
           {/* Navigation Buttons */}
-          <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex justify-between">
+          <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-800 flex justify-between">
             <Button
               variant="outline"
               onClick={() => router.push("/dashboard/blogs")}

@@ -118,7 +118,7 @@ const RecentBlogs = () => {
             <div className="space-y-6">
               {displayBlogs.slice(0, 3).map((blog, index) => (
                 <article
-                  key={blog._id}
+                  key={index}
                   className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 animate-slide-up"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
