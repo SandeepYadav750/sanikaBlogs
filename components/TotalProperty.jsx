@@ -487,7 +487,7 @@ const TotalProperty = () => {
       {/* Additional Insights Section with Real Data */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Growth Analysis Card */}
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border-none">
+        <Card className="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border-none">
           <CardContent className="p-5">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-blue-500 rounded-lg text-white">
@@ -555,7 +555,7 @@ const TotalProperty = () => {
         </Card>
 
         {/* Monthly Comparison Card */}
-        <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 border-none">
+        <Card className="bg-linear-to-r from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 border-none">
           <CardContent className="p-5">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-purple-500 rounded-lg text-white">

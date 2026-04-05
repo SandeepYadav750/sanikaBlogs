@@ -64,14 +64,20 @@ const RecentBlogs = () => {
       reads: "3.1k reads",
     },
   ];
+  const categoriess = [
+    "Web Application",
+    "Web Design",
+    "SEO",
+    "Digital Application",
+    "Mbile Application",
+  ];
 
   const categories = [
-    { name: "Blogging", count: 24, icon: "✍️" },
-    { name: "Web Development", count: 42, icon: "💻" },
-    { name: "Digital Marketing", count: 18, icon: "📊" },
-    { name: "Cooking", count: 12, icon: "🍳" },
-    { name: "Photography", count: 15, icon: "📸" },
-    { name: "Sports", count: 9, icon: "⚽" },
+    { name: "Web Application", count: 24, icon: "💻" }, // Globe/World Wide Web
+    { name: "Web Design", count: 42, icon: "🎨" }, // Art/Palette for design
+    { name: "SEO", count: 18, icon: "📈" }, // Growth chart for SEO
+    { name: "Digital Application", count: 12, icon: "📱" }, // Mobile/Digital device
+    { name: "Mbile Application", count: 15, icon: "📲" }, // Mobile phone with arrow
   ];
 
   const handleSubscribe = (e) => {
@@ -366,6 +372,9 @@ const RecentBlogs = () => {
               <div className="space-y-3">
                 {categories.map((category, index) => (
                   <div
+                    onClick={() =>
+                      router.push(`/searchList?q=${category.name}`)
+                    }
                     key={index}
                     className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all group"
                   >

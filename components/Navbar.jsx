@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/themeSlice";
 import { toast } from "react-toastify";
 import { logoutUser } from "@/redux/authSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +37,23 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
+  const [serachTerms, setSerachTerms] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (serachTerms.trim() !== "") {
+      router.push(`/searchList?q=${encodeURIComponent(serachTerms)}`);
+      setSerachTerms("");
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch(e);
+    }
+  };
+
   const linkClass = (href) => {
     const base = "cursor-pointer px-3 py-1 rounded-md";
     const active = pathname === href || pathname.startsWith(href + "/");
@@ -84,9 +101,15 @@ const Navbar = () => {
         {/* Search Bar */}
         <div className="flex-1 max-w-md mx-8">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search
+              onClick={handleSearch}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"
+            />
             <Input
               type="text"
+              value={serachTerms}
+              onChange={(e) => setSerachTerms(e.target.value)}
+              onKeyPress={handleKeyPress}
               placeholder="Search..."
               className="pl-10 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
             />

@@ -52,7 +52,7 @@ const blogId = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const id = params.id;
-  const { blogs, publishedBlogs, loading, message, error } = useSelector(
+  const { blog, blogs, publishedBlogs, loading, message, error } = useSelector(
     (store) => store.blog,
   );
   // Solution: Convert both to string for comparison
@@ -173,7 +173,7 @@ const blogId = () => {
     }
   };
 
-  if (!blogs) {
+  if (!blogs || !blog) {
     return <div>Loading...</div>;
   }
 
