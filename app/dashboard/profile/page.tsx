@@ -1,18 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FaFacebook, FaLinkedin } from "react-icons/fa";
 import { FaSquareXTwitter, FaSquareInstagram } from "react-icons/fa6";
 import EditProfileModal from "@/components/EditProfileModal";
+import TotalProperty from "@/components/TotalProperty";
 
 const Profile = () => {
   const { user } = useSelector((state: any) => state.auth.user);
@@ -20,13 +16,6 @@ const Profile = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const displayName = user.firstName + " " + user.lastName || " Guest User";
-
-  const stats = [
-    { title: "Total Views", value: "24.8K", change: "+12% from last month" },
-    { title: "Total Blogs", value: "8", change: "+4% from last month" },
-    { title: "Comments", value: "0", change: "+18% from last month" },
-    { title: "Likes", value: "0", change: "+7% from last month" },
-  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 flex gap-6 bg-gray-100 dark:bg-gray-900">
@@ -74,19 +63,7 @@ const Profile = () => {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <Card key={stat.title} className="p-4">
-              <CardContent>
-                <CardTitle className="text-lg">{stat.title}</CardTitle>
-                <div className="mt-2 text-2xl font-semibold">{stat.value}</div>
-                <CardDescription className="mt-1 text-green-400">
-                  {stat.change}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <TotalProperty />
       </main>
 
       <EditProfileModal
