@@ -108,10 +108,31 @@ export const likedComment = createAsyncThunk(
   },
 );
 
+export const getAllComment = createAsyncThunk(
+  "comment/getAllComment",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API}/comment/my-blogs/comments`, {
+        withCredentials: true,
+      });
+
+      console.log("fetch all comment response:", res.data);
+      return res.data;
+    } catch (error) {
+      console.error(
+        "fetch all comment error:",
+        error.res?.data || error.message,
+      );
+      return rejectWithValue(error.res?.data || error.message);
+    }
+  },
+);
+
 const commentSlice = createSlice({
   name: "comment",
   initialState: {
     comments: [],
+    allComments: null,
     loading: false,
     error: null,
     message: null,
@@ -238,6 +259,25 @@ const commentSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(likedComment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || "Failed to fetch liked data";
+        console.error("Fetch liked data rejected:", state.error);
+      })
+
+      // getAllComment comments cases
+      .addCase(getAllComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(getAllComment.fulfilled, (state, action) => {
+        state.loading = false;
+        // state.comments = action.payload;
+        state.allComments = action.payload;
+        console.log("getAllComment set in state:", state.comments);
+        state.message = action.payload.message;
+      })
+      .addCase(getAllComment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Failed to fetch liked data";
         console.error("Fetch liked data rejected:", state.error);

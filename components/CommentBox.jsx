@@ -58,6 +58,9 @@ const CommentBox = ({ blogId }) => {
   const [loadingId, setLoadingId] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
 
+  // FIX: Ensure comments is always an array
+  const safeComments = Array.isArray(comments) ? comments : [];
+
   // Fetch comments when component mounts or blogId changes
   useEffect(() => {
     if (blogId) {
@@ -294,7 +297,7 @@ const CommentBox = ({ blogId }) => {
           <div className="flex items-center justify-center gap-4 mt-4">
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>{comments?.length || 0} Comments</span>
+              <span>{safeComments?.length || 0} Comments</span>
             </div>
           </div>
         </div>
@@ -393,7 +396,7 @@ const CommentBox = ({ blogId }) => {
 
         {/* Comments List - Modern Card Design */}
         <div className="max-w-4xl mx-auto space-y-6">
-          {loading && comments?.length === 0 ? (
+          {loading && safeComments?.length === 0 ? (
             <div className="text-center py-16">
               <div className="relative inline-block">
                 <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
@@ -405,7 +408,7 @@ const CommentBox = ({ blogId }) => {
                 Loading amazing comments...
               </p>
             </div>
-          ) : comments?.length === 0 ? (
+          ) : safeComments?.length === 0 ? (
             <div className="text-center py-20 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
               <div className="inline-flex p-4 bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-full mb-4">
                 <MessageCircle className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
@@ -418,7 +421,7 @@ const CommentBox = ({ blogId }) => {
               </p>
             </div>
           ) : (
-            comments?.map((comment, index) => (
+            safeComments?.map((comment, index) => (
               <div
                 key={comment._id || comment.id}
                 className="group animate-fade-in-up"

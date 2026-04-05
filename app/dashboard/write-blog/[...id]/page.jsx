@@ -52,12 +52,12 @@ const blogId = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const id = params.id;
-  const { blog, blogs, publishedBlogs, loading, message, error } = useSelector(
+  const { blogs, publishedBlogs, loading, message, error } = useSelector(
     (store) => store.blog,
   );
   // Solution: Convert both to string for comparison
   const selectBlogData = blogs.find((blog) => String(blog._id) === String(id));
-  console.log("publishedBlogs", publishedBlogs);
+  // console.log("publishedBlogs", publishedBlogs);
   const [formData, setFormData] = useState({
     title: selectBlogData?.title,
     subtitle: selectBlogData?.subtitle,
@@ -173,7 +173,7 @@ const blogId = () => {
     }
   };
 
-  if (!blog) {
+  if (!blogs) {
     return <div>Loading...</div>;
   }
 

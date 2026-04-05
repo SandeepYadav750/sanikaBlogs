@@ -42,9 +42,10 @@ const Comments = () => {
       );
       const data = res.data;
       if (data.success) {
-        toast.success(data.message);
+        // toast.success(data.message);
         setAllComments(data);
       }
+      console.log("data", data);
     } catch (error) {
       console.error("fetch comments error:", error);
       toast.error(
@@ -224,7 +225,7 @@ const Comments = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
