@@ -1,18 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { fetchPublishedBlogs } from "@/redux/blogSlice";
 
 const SearchList = () => {
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
-  const { blogs } = useSelector((store) => store.blog);
+  // const { blogs } = useSelector((store) => store.blog);
+  const publishedBlogs = useSelector((state) => state.blog.publishedBlogs);
+  console.log("Published Blogs in SearchList:", publishedBlogs);
 
-  const filterBlogs = blogs.filter(
+  // Fetch blogs when component mounts
+  useEffect(() => {
+    dispatch(fetchPublishedBlogs());
+  }, [dispatch]);
+
+  const filterBlogs = publishedBlogs.filter(
     (blog) =>
       blog.title?.toLowerCase().includes(query) ||
       blog.subtitle?.toLowerCase().includes(query) ||

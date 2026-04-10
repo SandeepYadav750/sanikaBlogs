@@ -1,14 +1,22 @@
 "use client";
-import { useSelector } from "react-redux";
-import { selectPublishedBlogs } from "@/redux/blogSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPublishedBlogs } from "@/redux/blogSlice";
 
 const Blogs = () => {
-  const publishedBlogs = useSelector(selectPublishedBlogs);
+  const dispatch = useDispatch();
+
+  // Get state from Redux
+  const { publishedBlogs } = useSelector((state) => state.blog);
   const [hoveredCard, setHoveredCard] = useState(null);
+
+  // Fetch blogs when component mounts
+  useEffect(() => {
+    dispatch(fetchPublishedBlogs());
+  }, [dispatch]);
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -57,7 +65,7 @@ const Blogs = () => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header with animation */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="h-16 md:h-20 text-5xl md:text-6xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-400">

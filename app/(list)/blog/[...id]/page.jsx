@@ -47,11 +47,11 @@ const SingleBlog = () => {
   const id = params?.id;
 
   // Safely access Redux state with fallbacks
-  const {
-    blogs = [],
-    likedBlogs = [],
-    loading = false,
-  } = useSelector((store) => store.blog || {});
+  const { likedBlogs = [], loading = false } = useSelector(
+    (store) => store.blog || {},
+  );
+  const publishedBlogs = useSelector((state) => state.blog.publishedBlogs);
+
   const { user } = useSelector((state) => state.auth.user || {});
 
   const [selectedBlog, setSelectedBlog] = useState(null);
@@ -62,17 +62,12 @@ const SingleBlog = () => {
   // const [isLiking, setIsLiking] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  // console.log("blogs", blogs);
-  // console.log("likedBlogs", likedBlogs);
-  // console.log("selectedBlog", selectedBlog);
-  // console.log("blogLikeCount", blogLikeCount);
-
   // Fetch blogs and user's liked blogs on mount
   useEffect(() => {
     if (!initialFetchDone) {
       const fetchData = async () => {
         try {
-          await dispatch(fetchAllBlogs()).unwrap();
+          // await dispatch(fetchAllBlogs()).unwrap();
           if (user) {
             await dispatch(fetchUserLikedBlogs()).unwrap();
           }
@@ -89,11 +84,13 @@ const SingleBlog = () => {
 
   // Find blog and fetch liked status
   useEffect(() => {
-    if (blogs && blogs.length > 0 && id) {
-      const blog = blogs.find((b) => String(b?._id) === String(id));
-      setSelectedBlog(blog || null);
+    if (publishedBlogs && publishedBlogs.length > 0 && id) {
+      const publishedBlog = publishedBlogs.find(
+        (b) => String(b?._id) === String(id),
+      );
+      setSelectedBlog(publishedBlog || null);
     }
-  }, [blogs, id]);
+  }, [publishedBlogs, id]);
 
   // Update liked state based on likedBlogs from Redux
   useEffect(() => {
@@ -140,7 +137,7 @@ const SingleBlog = () => {
   const likeDislike = async () => {
     if (!selectedBlog || !user) {
       toast.error("Please login to like this blog");
-      alert(router.push("/login"));
+      router.push("/login");
       return;
     }
 

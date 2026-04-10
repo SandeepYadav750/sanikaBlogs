@@ -3,18 +3,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation"; // Add this import
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -34,7 +28,6 @@ import {
 } from "lucide-react";
 import { FaEdit } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
-// Import your Redux actions (adjust path as needed)
 import {
   createComment,
   deleteComment,
@@ -46,7 +39,9 @@ import { ImSpinner2 } from "react-icons/im";
 
 const CommentBox = ({ blogId }) => {
   const dispatch = useDispatch();
+  const router = useRouter(); // Add router
   const { user } = useSelector((state) => state.auth.user) || {};
+  console.log("user in comment box", user);
   const { comments, loading } = useSelector((state) => state.comment);
 
   const [comment, setComment] = useState("");
@@ -57,6 +52,14 @@ const CommentBox = ({ blogId }) => {
   const [likedComments, setLikedComments] = useState({});
   const [loadingId, setLoadingId] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
+
+  // Check if user is authenticated
+  const isAuthenticated = !!user?._id;
+
+  // Redirect to login function
+  const redirectToLogin = () => {
+    router.push("/login");
+  };
 
   // FIX: Ensure comments is always an array
   const safeComments = Array.isArray(comments) ? comments : [];
@@ -123,14 +126,21 @@ const CommentBox = ({ blogId }) => {
   };
 
   const handleReply = (commentId, userName) => {
+    // Check authentication before allowing reply
+    if (!isAuthenticated) {
+      toast.error("Please login to reply");
+      redirectToLogin();
+      return;
+    }
     setReplyTo(replyTo === commentId ? null : commentId);
     setReplyText(`@${userName} `);
   };
 
   const handleReplySubmit = async (parentCommentId) => {
     if (!replyText.trim()) return;
-    if (!user) {
+    if (!isAuthenticated) {
       toast.error("Please login to reply");
+      redirectToLogin();
       return;
     }
 
@@ -143,8 +153,9 @@ const CommentBox = ({ blogId }) => {
     e.preventDefault();
 
     if (!comment.trim()) return;
-    if (!user) {
+    if (!isAuthenticated) {
       toast.error("Please login to comment");
+      redirectToLogin();
       return;
     }
 
@@ -170,6 +181,7 @@ const CommentBox = ({ blogId }) => {
       console.error("Error submitting comment:", error);
       if (error.response?.status === 401) {
         toast.error("Authentication failed. Please login again.");
+        redirectToLogin();
       } else {
         toast.error(
           error.message || "Failed to submit comment. Please try again.",
@@ -179,18 +191,19 @@ const CommentBox = ({ blogId }) => {
   };
 
   const HandleDeleteSubmit = async (id) => {
-    try {
-      const result = await dispatch(deleteComment(id)).unwrap(); // Just pass the id
+    // Check authentication
+    if (!isAuthenticated) {
+      toast.error("Please login to delete comment");
+      redirectToLogin();
+      return;
+    }
 
+    try {
+      const result = await dispatch(deleteComment(id)).unwrap();
       console.log("result", result);
 
       if (result.success) {
         toast.success(result.message || "Comment deleted successfully!");
-        // Remove from local state
-        const updatedComments = comments.filter(
-          (item) => (item._id || item.id) !== id,
-        );
-        // If you have access to setComments or need to refetch:
         dispatch(fetchComments(blogId));
       } else {
         toast.error(result.message || "Error while deleting comment");
@@ -202,8 +215,7 @@ const CommentBox = ({ blogId }) => {
       );
     }
   };
-
-  // const HandleEditSubmit = async (id) => {
+   // const HandleEditSubmit = async (id) => {
   //   try {
   //     const res = await axios.put(
   //       `http://localhost:8000/api/comment/${id}/edit`,
@@ -230,10 +242,17 @@ const CommentBox = ({ blogId }) => {
   // };
 
   const HandleEditSubmit = async (id) => {
+    // Check authentication
+    if (!isAuthenticated) {
+      toast.error("Please login to edit comment");
+      redirectToLogin();
+      return;
+    }
+
     try {
       const result = await dispatch(
         editComment({
-          commentId: id, // ✅ You need to pass the commentId
+          commentId: id,
           content: editContent,
         }),
       ).unwrap();
@@ -256,6 +275,13 @@ const CommentBox = ({ blogId }) => {
   };
 
   const HandleLikeSubmit = async (id) => {
+    // Check authentication before liking
+    if (!isAuthenticated) {
+      toast.error("Please login to like comments");
+      redirectToLogin();
+      return;
+    }
+
     setLoadingId(id);
     try {
       const result = await dispatch(likedComment(id)).unwrap();
@@ -267,9 +293,14 @@ const CommentBox = ({ blogId }) => {
       }
     } catch (error) {
       console.error("Like error:", error);
-      toast.error(
-        error?.message || "Failed to Like comment. Please try again.",
-      );
+      // Don't show error for 401 as we already handled redirect
+      if (error.response?.status !== 401) {
+        toast.error(
+          error?.message || "Failed to Like comment. Please try again.",
+        );
+      }
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -335,17 +366,17 @@ const CommentBox = ({ blogId }) => {
                       onFocus={() => setIsFocused(true)}
                       onBlur={() => setIsFocused(false)}
                       placeholder={
-                        user
+                        isAuthenticated
                           ? "What are your thoughts?..."
                           : "Please login to join the discussion"
                       }
                       className="w-full p-2 md:px-5 md:py-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border-0 transition-all"
                       rows="3"
-                      disabled={loading || !user}
+                      disabled={loading || !isAuthenticated}
                     />
 
                     {/* Toolbar */}
-                    {user && (
+                    {isAuthenticated && (
                       <div className="absolute bottom-3 left-3 flex gap-2">
                         <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors group">
                           <Image className="w-4 h-4 text-gray-400 group-hover:text-indigo-500" />
@@ -372,7 +403,7 @@ const CommentBox = ({ blogId }) => {
                     <Button
                       type="submit"
                       onClick={handleCommentSubmit}
-                      disabled={!comment.trim() || !user || loading}
+                      disabled={!comment.trim() || !isAuthenticated || loading}
                       className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl py-2 md:px-6 md:py-2.5 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-xl"
                     >
                       {loading ? (
@@ -440,7 +471,6 @@ const CommentBox = ({ blogId }) => {
                             {comment.userId?.lastName?.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        {/* <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div> */}
                       </div>
 
                       <div className="flex-1">
@@ -472,7 +502,8 @@ const CommentBox = ({ blogId }) => {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent className="w-40" align="end">
                                 <DropdownMenuGroup>
-                                  {comment?.userId?._id === user?._id ? (
+                                  {comment?.userId?._id === user?._id &&
+                                  isAuthenticated ? (
                                     <>
                                       <DropdownMenuItem
                                         className="cursor-pointer text-blue-600 focus:text-blue-600"
@@ -495,7 +526,15 @@ const CommentBox = ({ blogId }) => {
                                       </DropdownMenuItem>
                                     </>
                                   ) : null}
-                                  <DropdownMenuItem className="cursor-pointer">
+                                  <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                      if (!isAuthenticated) {
+                                        toast.error("Please login to report");
+                                        redirectToLogin();
+                                      }
+                                    }}
+                                  >
                                     <Flag className="w-4 h-4 mr-2" />
                                     Report
                                   </DropdownMenuItem>
@@ -515,7 +554,7 @@ const CommentBox = ({ blogId }) => {
                               onBlur={() => setIsFocused(false)}
                               className="w-full p-2 md:px-5 md:py-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border-0 transition-all"
                               rows="3"
-                              disabled={loading || !user}
+                              disabled={loading || !isAuthenticated}
                             />
                             <div className="flex py-2 gap-2">
                               <Button
@@ -550,14 +589,14 @@ const CommentBox = ({ blogId }) => {
                           >
                             <div
                               className={`p-1 rounded-full transition-all ${
-                                comment.likes.includes(user._id)
+                                comment.likes?.includes(user?._id)
                                   ? "bg-red-50 dark:bg-red-900/20"
                                   : "group-hover:bg-red-50 dark:group-hover:bg-red-900/20"
                               }`}
                             >
                               <Heart
                                 className={`w-4 h-4 transition-all ${
-                                  comment.likes.includes(user._id)
+                                  comment.likes?.includes(user?._id)
                                     ? "fill-red-500 text-red-500 scale-110"
                                     : "group-hover:scale-110"
                                 }`}
@@ -565,8 +604,7 @@ const CommentBox = ({ blogId }) => {
                             </div>
                             <span
                               className={`flex gap-2 justify-center items-center ${
-                                // comment.likes.length !== 0
-                                comment.likes.includes(user._id)
+                                comment.likes?.includes(user?._id)
                                   ? "text-red-500 font-medium"
                                   : ""
                               }`}
@@ -576,7 +614,9 @@ const CommentBox = ({ blogId }) => {
                                   <ImSpinner2 className="animate-spin" />
                                 </>
                               ) : (
-                                comment.numberOfLikes || 0
+                                comment.numberOfLikes ||
+                                comment.likes?.length ||
+                                0
                               )}{" "}
                               likes
                             </span>
@@ -625,7 +665,7 @@ const CommentBox = ({ blogId }) => {
                                     placeholder={`Replying to @${comment.userId?.firstName} ${comment.userId?.lastName}...`}
                                     className="w-full px-4 py-2 text-sm bg-white dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none border-0 shadow-sm"
                                     rows="2"
-                                    disabled={loading}
+                                    disabled={loading || !isAuthenticated}
                                     autoFocus
                                   />
                                   <div className="mt-3 flex gap-2 justify-end">
@@ -646,7 +686,11 @@ const CommentBox = ({ blogId }) => {
                                       }
                                       size="sm"
                                       className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md"
-                                      disabled={loading || !replyText.trim()}
+                                      disabled={
+                                        loading ||
+                                        !replyText.trim() ||
+                                        !isAuthenticated
+                                      }
                                     >
                                       Post Reply
                                     </Button>

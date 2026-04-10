@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Input } from "./ui/input";
@@ -18,12 +17,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FiLogOut } from "react-icons/fi";
@@ -70,21 +65,22 @@ const Navbar = () => {
   const { theme } = useSelector((state) => state.theme);
 
   const logoutHandler = () => {
-    router.push("/login");
     dispatch(logoutUser());
+    toast.success(message);
+    router.push("/login");
   };
 
   useEffect(() => {
-    if (message && !isAuthenticated) {
-      toast.success(message);
-      console.log("Logout message:", message);
-      console.log("Logout user:", user);
-    }
+    // if (message && !isAuthenticated) {
+    //   toast.success(message);
+    //   console.log("Logout message:", message);
+    //   console.log("Logout user:", user);
+    // }
 
     if (error) {
       toast.error(error);
     }
-  }, [message, error, isAuthenticated]);
+  }, [error]);
 
   return (
     <div className="py-4 fixed w-full dark:bg-gray-800 dark:border-b-gray-600 border-b-gray-300 border-b-2 bg-white z-50">
@@ -103,7 +99,7 @@ const Navbar = () => {
           <div className="relative">
             <Search
               onClick={handleSearch}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"
+              className="absolute cursor-pointer right-0 p-2 rounded-md top-1/2 transform -translate-y-1/2 text-gray-400 w-9 h-9 bg-gray-300  dark:bg-gray-700"
             />
             <Input
               type="text"
@@ -111,7 +107,7 @@ const Navbar = () => {
               onChange={(e) => setSerachTerms(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search..."
-              className="pl-10 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+              className=" bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
             />
           </div>
         </div>

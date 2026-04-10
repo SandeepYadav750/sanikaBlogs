@@ -62,7 +62,7 @@ const SignUp = () => {
       toast.error(error);
     }
     if (userData) {
-      toast.success(message || "Registration successful!ERE");
+      toast.success(message || "Registration successfull");
       router.push("/login");
     }
   }, [userData, router, error]);

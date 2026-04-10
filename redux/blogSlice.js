@@ -133,9 +133,13 @@ export const fetchPublishedBlogs = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${API}/blog/get-published-blogs`, {
-        withCredentials: true,
+        withCredentials: false, // Make sure this is false for public access
       });
-      return res.data;
+      if (res.data.success) {
+        return res.data.blogs;
+      } else {
+        return rejectWithValue(res.data.message || "Failed to fetch blogs");
+      }
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch published blogs",
@@ -166,8 +170,7 @@ export const togglePublishBlog = createAsyncThunk(
 const filterPublishedBlogs = (blogs) => {
   return Array.isArray(blogs) ? blogs.filter((blog) => blog?.isPublished) : [];
 };
-export const selectPublishedBlogs = (state) =>
-  state.blog.blogs.filter((b) => b.isPublished);
+export const selectPublishedBlogs = (state) => state.blog.publishedBlogs;
 
 // ==========================
 // 🔥 INITIAL STATE
@@ -393,6 +396,7 @@ const blogSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
       // ==========================
       // FETCH PUBLISHED BLOGS
       // ==========================
@@ -402,19 +406,11 @@ const blogSlice = createSlice({
       })
       .addCase(fetchPublishedBlogs.fulfilled, (state, action) => {
         state.loading = false;
-
-        const publishedData = action.payload.publishedBlogs || action.payload;
-
-        state.publishedBlogs = Array.isArray(publishedData)
-          ? publishedData
-          : [];
-
-        state.error = null;
+        state.publishedBlogs = action.payload;
       })
       .addCase(fetchPublishedBlogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        state.publishedBlogs = [];
       })
 
       // toggle

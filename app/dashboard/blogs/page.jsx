@@ -26,7 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { fetchAllBlogs, deleteBlog } from "../../../redux/blogSlice";
+import { fetchAllBlogs, deleteBlog } from "@/redux/blogSlice";
 
 const BlogList = () => {
   const dispatch = useDispatch();

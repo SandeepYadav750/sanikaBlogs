@@ -2,24 +2,52 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPublishedBlogs } from "@/redux/blogSlice";
+import { fetchAllBlogs } from "@/redux/blogSlice";
+import Link from "next/link";
 
 const RecentBlogs = () => {
+  const dispatch = useDispatch();
   const { blogs } = useSelector((state) => state.blog);
   const [email, setEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState("");
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
+  // Get state from Redux
+  const { publishedBlogs } = useSelector((state) => state.blog);
+
+  // Fetch blogs when component mounts
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    dispatch(fetchPublishedBlogs());
+  }, [dispatch]);
+
+  // const publishedBlogs = useSelector((state) => state.blog.publishedBlogs);
+
+  // useEffect(() => {
+  //   setMounted(true);
+  //   fetchAllBlogsData();
+  // }, []);
+
+  // const fetchAllBlogsData = async () => {
+  //   try {
+  //     await dispatch(fetchAllBlogs());
+  //   } catch (err) {
+  //     console.error("Failed to fetch blogs:", err);
+  //     toast.error("Failed to load blogs");
+  //   }
+  // };
 
   // Sort blogs by creation date (most recent first)
   const sortedBlogs =
-    blogs?.length > 0
-      ? [...blogs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    publishedBlogs?.length > 0
+      ? [...publishedBlogs].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        )
       : [];
+  console.log("publishedBlogs", publishedBlogs);
+  console.log("sortedBlogs", sortedBlogs);
 
   const defaultBlogs = [
     {
@@ -64,20 +92,13 @@ const RecentBlogs = () => {
       reads: "3.1k reads",
     },
   ];
-  const categoriess = [
-    "Web Application",
-    "Web Design",
-    "SEO",
-    "Digital Application",
-    "Mbile Application",
-  ];
 
   const categories = [
     { name: "Web Application", count: 24, icon: "💻" }, // Globe/World Wide Web
     { name: "Web Design", count: 42, icon: "🎨" }, // Art/Palette for design
     { name: "SEO", count: 18, icon: "📈" }, // Growth chart for SEO
     { name: "Digital Application", count: 12, icon: "📱" }, // Mobile/Digital device
-    { name: "Mbile Application", count: 15, icon: "📲" }, // Mobile phone with arrow
+    { name: "Mobile Application", count: 15, icon: "📲" }, // Mobile phone with arrow
   ];
 
   const handleSubscribe = (e) => {
@@ -93,11 +114,13 @@ const RecentBlogs = () => {
   };
 
   const displayBlogs = sortedBlogs.length > 0 ? sortedBlogs : defaultBlogs;
+  console.log("displayBlogs", displayBlogs);
+  console.log("sortedBlogs", sortedBlogs);
 
-  if (!mounted) return null;
+  // if (!mounted) return null;
 
   return (
-    <div className="border-t border-white dark:border-gray-700 dark:bg-gray-700">
+    <div className="border-t border-white bg-gray-100 dark:border-gray-700 dark:bg-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Header Section with Animation */}
         <header className="text-center mb-12 lg:mb-16 animate-fade-in">
@@ -268,6 +291,16 @@ const RecentBlogs = () => {
                   </div>
                 </article>
               ))}
+              {displayBlogs.length > 3 && (
+                <div className="text-center mt-8">
+                  <Link
+                    href="/blogs"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                  >
+                    View All Blogs →
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Suggested Blogs Section - Modern Grid */}
