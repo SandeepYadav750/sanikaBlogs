@@ -46,8 +46,6 @@ const RecentBlogs = () => {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         )
       : [];
-  console.log("publishedBlogs", publishedBlogs);
-  console.log("sortedBlogs", sortedBlogs);
 
   const defaultBlogs = [
     {
@@ -114,8 +112,6 @@ const RecentBlogs = () => {
   };
 
   const displayBlogs = sortedBlogs.length > 0 ? sortedBlogs : defaultBlogs;
-  console.log("displayBlogs", displayBlogs);
-  console.log("sortedBlogs", sortedBlogs);
 
   // if (!mounted) return null;
 

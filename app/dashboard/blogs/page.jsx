@@ -32,10 +32,20 @@ const BlogList = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { blogs, loading, message, error } = useSelector((state) => state.blog);
-
+  console.log("BlogList - Blog State:", {
+    blogs,
+    loading,
+    message,
+    error,
+  });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedBlogId, setSelectedBlogId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const sortedBlogs =
+    blogs?.length > 0
+      ? [...blogs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      : [];
 
   // Fetch blogs on component mount
   useEffect(() => {
@@ -107,7 +117,7 @@ const BlogList = () => {
   };
 
   // Loading state
-  if (loading && (!blogs || blogs.length === 0)) {
+  if (loading && (!sortedBlogs || sortedBlogs.length === 0)) {
     return (
       <div className="flex justify-center items-center min-h-[60vh] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center transform transition-all duration-500">
@@ -161,7 +171,7 @@ const BlogList = () => {
   }
 
   // Empty state
-  if (!blogs || blogs.length === 0) {
+  if (!sortedBlogs || sortedBlogs.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[60vh] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center max-w-md mx-auto px-6">
@@ -241,7 +251,7 @@ const BlogList = () => {
                   Total Blogs
                 </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {blogs.length}
+                  {sortedBlogs.length}
                 </p>
               </div>
               <div className="bg-indigo-100 dark:bg-indigo-900/30 rounded-full p-3">
@@ -270,8 +280,9 @@ const BlogList = () => {
                 </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
                   {
-                    new Set(blogs.map((blog) => blog?.category).filter(Boolean))
-                      .size
+                    new Set(
+                      sortedBlogs.map((blog) => blog?.category).filter(Boolean),
+                    ).size
                   }
                 </p>
               </div>
@@ -300,7 +311,9 @@ const BlogList = () => {
                   Last Updated
                 </p>
                 <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                  {blogs[0]?.createdAt ? formatDate(blogs[0].createdAt) : "N/A"}
+                  {sortedBlogs[0]?.createdAt
+                    ? formatDate(sortedBlogs[0].createdAt)
+                    : "N/A"}
                 </p>
               </div>
               <div className="bg-green-100 dark:bg-green-900/30 rounded-full p-3">
@@ -326,7 +339,7 @@ const BlogList = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* Mobile View - Cards */}
           <div className="block lg:hidden">
-            {blogs.filter(Boolean).map((blog, index) => (
+            {sortedBlogs.filter(Boolean).map((blog, index) => (
               <div
                 key={blog?._id}
                 className="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
@@ -435,7 +448,7 @@ const BlogList = () => {
               </TableHeader>
 
               <TableBody>
-                {blogs.filter(Boolean).map((blog, index) => (
+                {sortedBlogs.filter(Boolean).map((blog, index) => (
                   <TableRow
                     key={blog?._id}
                     className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
