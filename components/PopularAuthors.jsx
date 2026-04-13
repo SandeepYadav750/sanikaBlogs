@@ -23,6 +23,7 @@ const PopularAuthors = () => {
     }
     return countMap;
   }, [blogs]);
+  console.log("Blog count by author:", blogs);
 
   // Fetch all users when component mounts
   useEffect(() => {
@@ -31,15 +32,23 @@ const PopularAuthors = () => {
     }
   }, [dispatch, allUsers]);
 
-  // Update local state when allUsers changes
+  // Update local state when allUsers changes and sort by post count
   useEffect(() => {
     if (allUsers) {
       // Handle different possible response structures
       const usersArray = allUsers.users || allUsers || [];
-      setPopularUser(usersArray);
-    }
-  }, [allUsers]);
 
+      // Sort users by post count in descending order (highest first)
+      const sortedUsers = [...usersArray].sort((a, b) => {
+        const postCountA = blogCountByAuthor.get(a._id) || 0;
+        const postCountB = blogCountByAuthor.get(b._id) || 0;
+        return postCountB - postCountA;
+      });
+
+      setPopularUser(sortedUsers);
+    }
+  }, [allUsers, blogCountByAuthor]);
+  console.log("Popular Authors:", popularUser);
   // Show loading state
   if (loading) {
     return (
@@ -129,7 +138,10 @@ const PopularAuthors = () => {
 
       {popularUser.length > 4 && (
         <div className="text-center mt-8">
-          <button className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+          <button
+            onClick={() => (window.location.href = "/authors")}
+            className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+          >
             View All Authors →
           </button>
         </div>

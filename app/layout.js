@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
         <Provider>
           <ThemeProvider>
             <Navbar />
-            <div className="pt-20">{children}</div>
+            <div className="SandeepYadav">{children}</div>
             <Footer />
           </ThemeProvider>
         </Provider>

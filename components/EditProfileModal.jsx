@@ -18,7 +18,7 @@ import { updateUser } from "@/redux/authSlice";
 const EditProfileModal = ({ isOpen, onClose }) => {
   const { user } = useSelector((state) => state.auth.user);
   // ✅ FIXED — correct slice nameq
-  const { loading, message, error } = useSelector((state) => state.auth, );
+  const { loading, message, error } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
@@ -80,10 +80,15 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     if (imageFile) {
       formDataApp.append("file", imageFile);
     }
-    dispatch(updateUser(formDataApp));
-    if (!error) {
-      toast.success(message);
+
+    const result = await dispatch(updateUser(formDataApp));
+    if (updateUser.fulfilled.match(result)) {
+      toast.success(result.payload.message);
       onClose();
+    } else {
+      toast.error(
+        result.payload.message || error || "User profile updation failed",
+      );
     }
   };
 

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchPublishedBlogs } from "@/redux/blogSlice";
 import { fetchAllBlogs } from "@/redux/blogSlice";
 import Link from "next/link";
+import { Input } from "./ui/input";
 
 const RecentBlogs = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,22 @@ const RecentBlogs = () => {
   const [newsletterStatus, setNewsletterStatus] = useState("");
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
+  const [searchTerms, setSearchTerms] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerms.trim() !== "") {
+      router.push(`/searchList?q=${encodeURIComponent(searchTerms)}`);
+      setSearchTerms("");
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch(e);
+    }
+  };
 
   // Get state from Redux
   const { publishedBlogs } = useSelector((state) => state.blog);
@@ -359,8 +376,11 @@ const RecentBlogs = () => {
             {/* Search Widget */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
               <div className="relative">
-                <input
+                <Input
                   type="text"
+                  value={searchTerms}
+                  onChange={(e) => setSearchTerms(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   placeholder="Search articles..."
                   className="w-full px-4 py-3 pl-11 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all dark:text-white"
                 />

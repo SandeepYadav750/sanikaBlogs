@@ -24,7 +24,7 @@ const DashboardSidebar = () => {
   };
 
   return (
-    <aside className="min-h-screen w-60 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm sticky top-4 bottom-0">
+    <aside className="hidden md:block min-h-screen w-60 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm sticky top-4 bottom-0">
       <nav className="flex flex-col space-y-2">
         <Link
           href="/dashboard/profile"
