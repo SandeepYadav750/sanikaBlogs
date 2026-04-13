@@ -25,7 +25,7 @@ const categories = [
   "Web Design",
   "SEO",
   "Digital Application",
-  "Mbile Application",
+  "Mobile Application",
 ];
 
 const WriteBlog = () => {
@@ -74,11 +74,11 @@ const WriteBlog = () => {
     }
 
     try {
-      const res = await dispatch(createBlog(formDataApp));
-
-      if (createBlog.fulfilled.match(res)) {
-        toast.success(message);
-        const BlogId = res.payload.blog?._id || res.payload._id;
+      const result = await dispatch(createBlog(formDataApp));
+      console.log("createBlog result:", result);
+      if (createBlog.fulfilled.match(result)) {
+        toast.success(result.payload.message);
+        const BlogId = result.payload.blog?._id || result.payload._id;
         if (BlogId) {
           // router.push(`/dashboard/write-blog/${BlogId}`);
           router.push(`/dashboard/blogs`);
@@ -86,15 +86,24 @@ const WriteBlog = () => {
       } else {
         toast.error(error || "Blog creation failed");
       }
+      // if (result.success) {
+      //   setComment("");
+      //   toast.success(result.message || "Comment added successfully!");
+      //   dispatch(fetchComments(blogId));
+      // } else {
+      //   toast.error(
+      //     result.message || "Comment Submit Failed. Please try again.",
+      //   );
+      // }
     } catch (err) {
       console.error("blog not created", err);
       toast.error("Blog creation failed");
     }
   };
 
-  const blogselectData = useSelector((state) => state.blog);
-  console.log("blogselectData:", blogselectData);
-  console.log("blogselectDataBlog:", blogselectData.blog);
+  // const blogselectData = useSelector((state) => state.blog);
+  // console.log("blogselectData:", blogselectData);
+  // console.log("blogselectDataBlog:", blogselectData.blogs);
 
   return (
     <div className="min-h-[calc(100vh-80px)]">

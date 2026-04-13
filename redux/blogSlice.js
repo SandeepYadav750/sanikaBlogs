@@ -419,6 +419,7 @@ const blogSlice = createSlice({
         state.error = null;
       })
       .addCase(togglePublishBlog.fulfilled, (state, action) => {
+        state.loading = false;
         const { blogId, data } = action.payload;
         const updatedBlog = data.blog;
 

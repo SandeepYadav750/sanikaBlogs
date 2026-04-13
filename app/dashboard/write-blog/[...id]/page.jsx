@@ -102,14 +102,20 @@ const blogId = () => {
     }
 
     try {
-      dispatch(updateBlog({ id, data: formDataApp }));
-
-      if (!error) {
-        toast.success(message);
+      const result = await dispatch(updateBlog({ id, data: formDataApp }));
+      console.log("updateBlog result:", result);
+      if (updateBlog.fulfilled.match(result)) {
+        toast.success(result.payload.message);
         router.push(`/blog/${id}`);
       } else {
-        toast.error(error);
+        toast.error(error || "Blog creation failed");
       }
+      // if (!error) {
+      //   toast.success(message);
+      //   router.push(`/blog/${id}`);
+      // } else {
+      //   toast.error(error);
+      // }
     } catch (error) {
       console.log(error);
       console.error(error);
@@ -118,20 +124,21 @@ const blogId = () => {
 
   const togglePublish = async () => {
     try {
-      const res = await dispatch(togglePublishBlog(selectBlogData?._id));
-      console.log("selectBlogData?._id", selectBlogData?._id);
-      if (togglePublishBlog.fulfilled.match(res)) {
-        toast.success(message);
+      const result = await dispatch(togglePublishBlog(selectBlogData?._id));
+      // console.log("selectBlogData?._id", selectBlogData?._id);
+      console.log("togglePublish result:", result);
+      if (togglePublishBlog.fulfilled.match(result)) {
+        toast.success(result.payload.data.message);
       } else {
-        toast.error(error || "failed to published");
+        toast.error(result.payload.data.message || "failed to published");
       }
-      // if (res.data.success) {
+      // if (result.data.success) {
       //   setPublish(!publish);
-      //   toast.success(res.data.message || "blog publish");
+      //   toast.success(result.data.message || "blog publish");
       //   // router.push("/dashboard/blogs");
       //   console.log("selectBlogDatasuccess", selectBlogData);
       // } else {
-      //   toast.error(res.data.message || "failed to published");
+      //   toast.error(result.data.message || "failed to published");
       // }
     } catch (error) {
       toast.error(error);
@@ -158,11 +165,11 @@ const blogId = () => {
       toast.error(error);
 
       if (deleteBlog.fulfilled.match(result)) {
-        toast.success(message);
+        toast.success(result.payload.data.message);
         // Refresh the blog list
         router.push("/dashboard/blogs");
       } else {
-        toast.error(error || "blog deleted");
+        toast.error(result.payload.data.message || "Failed to delete blog");
       }
     } catch (error) {
       console.error("Delete error:", error);

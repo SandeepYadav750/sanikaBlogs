@@ -95,10 +95,13 @@ const SingleBlog = () => {
   // Update liked state based on likedBlogs from Redux
   useEffect(() => {
     if (selectedBlog && user && likedBlogs && Array.isArray(likedBlogs)) {
-      const hasLiked = likedBlogs.includes(selectedBlog._id);
+      // Check if the current blog ID exists in likedBlogs array
+      const hasLiked = likedBlogs.some(
+        (blog) => String(blog?._id || blog) === String(selectedBlog._id),
+      );
+
       setLiked(hasLiked);
       setBlogLikeCount(selectedBlog.likes?.length || 0);
-      // setBlogLikeCount(likedBlogs?.length || 0);
     }
   }, [selectedBlog, user, likedBlogs]);
 
@@ -496,7 +499,7 @@ const SingleBlog = () => {
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                 <Eye className="w-4 h-4" />
-                {selectedBlog.views || 1245} views
+                {selectedBlog.views || 1283} views
               </div>
             </div>
           </div>
