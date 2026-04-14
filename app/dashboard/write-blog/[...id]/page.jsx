@@ -106,7 +106,7 @@ const blogId = () => {
       console.log("updateBlog result:", result);
       if (updateBlog.fulfilled.match(result)) {
         toast.success(result.payload.message);
-        router.push(`/blog/${id}`);
+        router.push("/dashboard/blogs");
       } else {
         toast.error(error || "Blog creation failed");
       }
@@ -165,7 +165,7 @@ const blogId = () => {
       toast.error(error);
 
       if (deleteBlog.fulfilled.match(result)) {
-        toast.success(result.payload.data.message);
+        toast.success(result.payload.message);
         // Refresh the blog list
         router.push("/dashboard/blogs");
       } else {

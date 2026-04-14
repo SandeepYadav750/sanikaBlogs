@@ -23,8 +23,11 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { getAllComment } from "@/redux/commentSlice";
 
 const Comments = () => {
+  const dispatch = useDispatch();
   const [allComments, setAllComments] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("all"); // all, mostLiked, recent
@@ -34,18 +37,19 @@ const Comments = () => {
   const fetchAllComments = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        `http://localhost:8000/api/comment/my-blogs/comments`,
-        {
-          withCredentials: true,
-        },
-      );
-      const data = res.data;
-      if (data.success) {
-        // toast.success(data.message);
-        setAllComments(data);
+      const result = await dispatch(getAllComment());
+      // const res = await axios.get(
+      //   `https://sanikablogsbackend-1.onrender.com/api/comment/my-blogs/comments`,
+      //   {
+      //     withCredentials: true,
+      //   },
+      // );
+      console.log("fetch all comment response:", result.payload);
+      if (getAllComment.fulfilled.match(result)) {
+        setAllComments(result.payload);
+      } else {
+        toast.error(error || "comment fetch failed");
       }
-      console.log("data", data);
     } catch (error) {
       console.error("fetch comments error:", error);
       toast.error(

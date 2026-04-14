@@ -10,6 +10,9 @@ export const registerUser = createAsyncThunk(
     try {
       const res = await axios.post(`${API}/user/register`, userData, {
         withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       return res.data; // Return the full response data
     } catch (error) {
@@ -27,8 +30,19 @@ export const loginUser = createAsyncThunk(
     try {
       const res = await axios.post(`${API}/user/login`, userData, {
         withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-      console.log("SUCCESS RESPONSE:", res.data.user); // 👈 ADD THIS
+
+      console.log("Login Response:", res.data);
+      console.log("Cookies set:", document.cookie);
+
+      // Store token in localStorage as backup
+      if (res.data.token) {
+        localStorage.setItem("authToken", res.data.token);
+      }
+
       return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
@@ -44,6 +58,9 @@ export const logoutUser = createAsyncThunk(
       const res = await axios.get(`${API}/user/logout`, {
         withCredentials: true,
       });
+
+      // Clear localStorage
+      localStorage.removeItem("authToken");
 
       return res.data; // { success, message }
     } catch (error) {
@@ -85,6 +102,34 @@ export const getAllUsers = createAsyncThunk(
   },
 );
 
+// 🔥 Check Auth Status - ADD THIS NEW THUNK
+export const checkAuthStatus = createAsyncThunk(
+  "auth/checkAuthStatus",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Try to get token from cookie or localStorage
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        return rejectWithValue("No token found");
+      }
+
+      // Verify token with backend
+      const res = await axios.get(`${API}/user/verify`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Not authenticated",
+      );
+    }
+  },
+);
+
 // 🧠 SLICE
 const authSlice = createSlice({
   name: "auth",
@@ -102,6 +147,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      state.token = null;
+      localStorage.removeItem("authToken");
     },
 
     setUser: (state, action) => {
@@ -160,8 +207,9 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = null;
+        state.token = null;
         state.isAuthenticated = false;
-        state.message = action.payload.message; // 👈 toast ke liye
+        state.message = action.payload.message;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
@@ -198,6 +246,15 @@ const authSlice = createSlice({
       .addCase(getAllUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // CHECK AUTH STATUS
+      .addCase(checkAuthStatus.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+      })
+      .addCase(checkAuthStatus.rejected, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
       });
   },
 });

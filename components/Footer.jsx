@@ -98,7 +98,7 @@ const Footer = () => {
             </li>
             <li>
               <Link
-                href="/faqs"
+                href="#"
                 className="hover:text-red-400 transition-colors duration-200 flex items-center gap-2"
               >
                 <span className="text-red-400">›</span> FAQs

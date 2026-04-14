@@ -69,6 +69,7 @@ const Login = () => {
         <Image
           src="/auth.jpg"
           alt="signUp"
+          loading="eager"
           width={700}
           height={400}
           className="w-[95%] h-164 "
