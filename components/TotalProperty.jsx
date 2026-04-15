@@ -6,7 +6,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { getAllComment } from "@/redux/commentSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { fetchUserLikedBlogs } from "@/redux/blogSlice";
@@ -35,7 +35,7 @@ const TotalProperty = () => {
 
   // State for storing historical data
   const [historicalData, setHistoricalData] = useState({
-    views: { current: 24800, lastMonth: 22143 }, // Example: 24.8K now, 22.1K last month
+    views: { current: 24800, lastMonth: 22143 },
     blogs: { current: 0, lastMonth: 0 },
     comments: { current: 0, lastMonth: 0 },
     likes: { current: 0, lastMonth: 0 },
@@ -54,61 +54,12 @@ const TotalProperty = () => {
     };
   };
 
-  // Fetch historical data (last month's stats)
-  const fetchHistoricalData = async () => {
-    try {
-      // Get last month's date range
-      const now = new Date();
-      const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-
-      // Format dates for API request
-      const startDate = lastMonthStart.toISOString().split("T")[0];
-      const endDate = lastMonthEnd.toISOString().split("T")[0];
-
-      // Example API calls to get historical data
-      // You need to implement these endpoints in your backend
-
-      // Option 1: If you have API endpoints for historical data
-      // const historicalComments = await dispatch(getHistoricalComments({ startDate, endDate }));
-      // const historicalLikes = await dispatch(getHistoricalLikes({ startDate, endDate }));
-      // const historicalBlogs = await dispatch(getHistoricalBlogs({ startDate, endDate }));
-
-      // Option 2: Calculate from existing data if you have timestamps
-      // For now, I'll show you the structure
-
-      console.log("Fetching historical data from:", startDate, "to:", endDate);
-
-      // Placeholder - Replace with actual API calls
-      return {
-        comments: 0,
-        likes: 0,
-        blogs: 0,
-      };
-    } catch (error) {
-      console.error("Error fetching historical data:", error);
-      return null;
-    }
-  };
-
-  // Alternative: Calculate changes based on actual data with timestamps
-  const calculateRealChanges = (currentItems, historicalItems, type) => {
-    if (!historicalItems || historicalItems.length === 0) {
-      return { value: 0, trend: "neutral", display: "0%" };
-    }
-
-    const currentCount = currentItems.length || currentItems;
-    const historicalCount = historicalItems.length || historicalItems;
-
-    return calculatePercentageChange(currentCount, historicalCount);
-  };
-
-  const fetchAllComments = async () => {
+  // Fetch all comments - wrapped in useCallback
+  const fetchAllComments = useCallback(async () => {
     try {
       setLoading((prev) => ({ ...prev, comments: true }));
       const result = await dispatch(getAllComment());
 
-      // Update current comments count
       setHistoricalData((prev) => ({
         ...prev,
         comments: {
@@ -126,16 +77,16 @@ const TotalProperty = () => {
     } finally {
       setLoading((prev) => ({ ...prev, comments: false }));
     }
-  };
+  }, [dispatch]);
 
-  const fetchUsertotalLikedBlogs = async () => {
+  // Fetch total liked blogs - wrapped in useCallback
+  const fetchUsertotalLikedBlogs = useCallback(async () => {
     try {
       setLoading((prev) => ({ ...prev, likes: true }));
       const result = await dispatch(fetchUserLikedBlogs());
-      const currentLikes = result.payload.totalLikes;
+      const currentLikes = result.payload?.totalLikes || 0;
       setTotalLikes(currentLikes);
 
-      // Update current likes count
       setHistoricalData((prev) => ({
         ...prev,
         likes: {
@@ -153,11 +104,29 @@ const TotalProperty = () => {
     } finally {
       setLoading((prev) => ({ ...prev, likes: false }));
     }
-  };
+  }, [dispatch]);
 
-  // Function to get last month's data from localStorage or database
-  const loadHistoricalData = () => {
-    // Option 1: Store data monthly in localStorage
+  // Save current month's data for next month comparison - wrapped in useCallback
+  const saveHistoricalData = useCallback(() => {
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
+    const dataToSave = {
+      month: currentMonth,
+      data: {
+        blogs: blogs?.length || 0,
+        comments: allComments?.totalComments || 0,
+        likes: totalLikes || 0,
+        views: 24800,
+      },
+    };
+    localStorage.setItem(
+      "dashboard_historical_data",
+      JSON.stringify(dataToSave),
+    );
+  }, [blogs?.length, allComments?.totalComments, totalLikes]);
+
+  // Function to get last month's data from localStorage
+  const loadHistoricalData = useCallback(() => {
     const storedData = localStorage.getItem("dashboard_historical_data");
     if (storedData) {
       const parsed = JSON.parse(storedData);
@@ -174,84 +143,63 @@ const TotalProperty = () => {
         }));
       }
     }
-  };
+  }, []);
 
-  // Save current month's data for next month comparison
-  const saveHistoricalData = () => {
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
-    const dataToSave = {
-      month: currentMonth,
-      data: {
-        blogs: blogs?.length || 0,
-        comments: allComments?.totalComments || 0,
-        likes: totalLikes || 0,
-        views: 24800, // Replace with actual views from API
-      },
-    };
-    localStorage.setItem(
-      "dashboard_historical_data",
-      JSON.stringify(dataToSave),
-    );
-  };
+  // Function to get real change values
+  const getRealChangeValue = useCallback(
+    (type, currentValue) => {
+      let lastMonthValue = 0;
 
-  // Function to get real change values (to be called after data loads)
-  const getRealChangeValue = (type, currentValue) => {
-    let lastMonthValue = 0;
+      switch (type) {
+        case "Total Views":
+          lastMonthValue = historicalData.views.lastMonth;
+          break;
+        case "Total Blogs":
+          lastMonthValue = historicalData.blogs.lastMonth;
+          break;
+        case "Comments":
+          lastMonthValue = historicalData.comments.lastMonth;
+          break;
+        case "Likes":
+          lastMonthValue = historicalData.likes.lastMonth;
+          break;
+        default:
+          lastMonthValue = 0;
+      }
 
-    switch (type) {
-      case "Total Views":
-        lastMonthValue = historicalData.views.lastMonth;
-        break;
-      case "Total Blogs":
-        lastMonthValue = historicalData.blogs.lastMonth;
-        break;
-      case "Comments":
-        lastMonthValue = historicalData.comments.lastMonth;
-        break;
-      case "Likes":
-        lastMonthValue = historicalData.likes.lastMonth;
-        break;
-      default:
-        lastMonthValue = 0;
-    }
+      const change = calculatePercentageChange(currentValue, lastMonthValue);
 
-    const change = calculatePercentageChange(currentValue, lastMonthValue);
+      if (lastMonthValue === 0 && currentValue > 0) {
+        return {
+          ...change,
+          display: "New this month",
+          isNew: true,
+        };
+      }
 
-    // If no historical data exists yet
-    if (lastMonthValue === 0 && currentValue > 0) {
-      return {
-        ...change,
-        display: "New this month",
-        isNew: true,
-      };
-    }
+      return change;
+    },
+    [historicalData],
+  );
 
-    return change;
-  };
-
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([fetchAllComments(), fetchUsertotalLikedBlogs()]);
 
-    // After fetching current data, save for next month comparison
     setTimeout(() => {
       saveHistoricalData();
       toast.success("Statistics updated successfully!");
     }, 500);
 
     setTimeout(() => setRefreshing(false), 1000);
-  };
+  }, [fetchAllComments, fetchUsertotalLikedBlogs, saveHistoricalData]);
 
+  // Main useEffect with all dependencies
   useEffect(() => {
-    // Load historical data first
     loadHistoricalData();
-
-    // Fetch current data
     fetchAllComments();
     fetchUsertotalLikedBlogs();
 
-    // Save current data at the end of month (optional)
     const now = new Date();
     const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     const timeUntilEndOfMonth = lastDayOfMonth - now;
@@ -261,7 +209,12 @@ const TotalProperty = () => {
     }, timeUntilEndOfMonth);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [
+    loadHistoricalData,
+    fetchAllComments,
+    fetchUsertotalLikedBlogs,
+    saveHistoricalData,
+  ]);
 
   // Update historical data when blogs change
   useEffect(() => {
@@ -367,7 +320,7 @@ const TotalProperty = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const title = stat.title;
           const value = getValue(title);
           const change = stat.getChange();
@@ -431,7 +384,7 @@ const TotalProperty = () => {
                     )}
                   </div>
 
-                  {/* Additional Info - Now dynamic */}
+                  {/* Additional Info */}
                   <CardDescription className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     {change.isNew ? (
                       <span className="text-blue-500">
@@ -461,7 +414,7 @@ const TotalProperty = () => {
                   </CardDescription>
                 </div>
 
-                {/* Progress Bar based on actual growth */}
+                {/* Progress Bar */}
                 <div className="mt-4 h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className={`h-full ${stat.iconColor.replace("text", "bg")} rounded-full transition-all duration-500`}
@@ -484,7 +437,7 @@ const TotalProperty = () => {
         })}
       </div>
 
-      {/* Additional Insights Section with Real Data */}
+      {/* Additional Insights Section */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Growth Analysis Card */}
         <Card className="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border-none">
@@ -530,7 +483,8 @@ const TotalProperty = () => {
                           📈 Best performing:{" "}
                           <span className="font-semibold text-green-600">
                             {bestPerformer
-                              ? bestPerformer.key
+                              ? bestPerformer.key.charAt(0).toUpperCase() +
+                                bestPerformer.key.slice(1)
                               : "No growth yet"}
                           </span>
                         </p>

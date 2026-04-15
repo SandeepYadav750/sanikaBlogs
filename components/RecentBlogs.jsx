@@ -4,16 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublishedBlogs } from "@/redux/blogSlice";
-import { fetchAllBlogs } from "@/redux/blogSlice";
 import Link from "next/link";
 import { Input } from "./ui/input";
 
 const RecentBlogs = () => {
   const dispatch = useDispatch();
-  const { blogs } = useSelector((state) => state.blog);
   const [email, setEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState("");
-  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   const [searchTerms, setSearchTerms] = useState("");
@@ -338,7 +335,7 @@ const RecentBlogs = () => {
               </div>
 
               <div className="grid gap-4">
-                {suggestedBlogs.map((blog, index) => (
+                {suggestedBlogs.map((blog) => (
                   <div
                     key={blog.id}
                     className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-all duration-300 group border border-transparent hover:border-gray-200 dark:hover:border-gray-600"

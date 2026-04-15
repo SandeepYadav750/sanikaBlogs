@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "@/redux/authSlice";
 import Image from "next/image";
@@ -7,28 +7,29 @@ import { fetchPublishedBlogs } from "../redux/blogSlice";
 
 const PopularAuthors = () => {
   const dispatch = useDispatch();
-  const { blogs } = useSelector((state) => state.blog);
   const { allUsers, loading, error } = useSelector((state) => state.auth);
-  const [popularAuthors, setPopularAuthors] = useState([]);
-  console.log("All users from Redux:", allUsers);
-  console.log("Blogs from Redux:", blogs);
-
   const { publishedBlogs } = useSelector((state) => state.blog);
 
-  // Fetch blogs when component mounts
-  useEffect(() => {
-    dispatch(fetchPublishedBlogs());
-    dispatch(getAllUsers());
-  }, [dispatch]);
+  console.log("All users from Redux:", allUsers);
+  console.log("Published blogs from Redux:", publishedBlogs);
 
-  // Calculate blog count for each author and sort by post count
-  const getPopularAuthors = useCallback(() => {
+  // Fetch blogs and users when component mounts
+  useEffect(() => {
+    if (!publishedBlogs) {
+      dispatch(fetchPublishedBlogs());
+    }
+    if (!allUsers) {
+      dispatch(getAllUsers());
+    }
+  }, [dispatch, publishedBlogs, allUsers]);
+
+  // Calculate popular authors using useMemo (no setState needed)
+  const popularAuthors = useMemo(() => {
     // Get users array safely
     const usersArray = allUsers?.users || allUsers || [];
 
     if (!usersArray.length || !publishedBlogs?.length) {
-      setPopularAuthors([]);
-      return;
+      return [];
     }
 
     // Calculate post count for each author
@@ -47,15 +48,8 @@ const PopularAuthors = () => {
       .sort((a, b) => b.postCount - a.postCount)
       .slice(0, 4);
 
-    setPopularAuthors(sortedAuthors);
+    return sortedAuthors;
   }, [publishedBlogs, allUsers]);
-
-  // Update popular authors whenever publishedBlogs or users change
-  useEffect(() => {
-    if (publishedBlogs && allUsers) {
-      getPopularAuthors();
-    }
-  }, [publishedBlogs, allUsers, getPopularAuthors]);
 
   // Loading state
   if (loading && !allUsers) {
@@ -96,7 +90,7 @@ const PopularAuthors = () => {
 
       {popularAuthors.length === 0 ? (
         <div className="text-center text-gray-500 py-8">
-          {publishedBlogs?.length === 0
+          {!publishedBlogs || publishedBlogs.length === 0
             ? "No posts yet."
             : "No authors found yet."}
         </div>

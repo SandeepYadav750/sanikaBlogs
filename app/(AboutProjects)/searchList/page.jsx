@@ -98,7 +98,7 @@ const SearchList = () => {
         Search Page
       </h1>
       <h3 className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-        Search results for: "{query}"
+        Search results for: &quot;{query}&quot;
       </h3>
 
       {filterBlogs.length === 0 ? (

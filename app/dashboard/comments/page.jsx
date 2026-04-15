@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; // Make sure you have this shadcn/ui component
@@ -19,10 +19,8 @@ import {
   Eye,
   Search,
   X,
-  Filter,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { getAllComment } from "@/redux/commentSlice";
 
@@ -104,6 +102,7 @@ const Comments = () => {
         return `${diffInYears} year${diffInYears !== 1 ? "s" : ""} ago`;
       }
     } catch (error) {
+      console.error("Date formatting error:", error);
       return "recently";
     }
   };
@@ -120,6 +119,7 @@ const Comments = () => {
         minute: "2-digit",
       });
     } catch (error) {
+      console.error("Date formatting error:", error);
       return dateString;
     }
   };
@@ -229,7 +229,7 @@ const Comments = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
@@ -410,7 +410,7 @@ const Comments = () => {
                   No matching comments
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  No comments found matching "{searchQuery}"
+                  No comments found matching &quot;{searchQuery}&quot;
                 </p>
                 <Button onClick={clearSearch} variant="outline">
                   Clear search
@@ -423,7 +423,7 @@ const Comments = () => {
                   No comments yet
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  When readers comment on your blogs, they'll appear here
+                  When readers comment on your blogs, they&apos;ll appear here
                 </p>
               </>
             )}

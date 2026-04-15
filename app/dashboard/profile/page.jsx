@@ -11,12 +11,13 @@ import EditProfileModal from "@/components/EditProfileModal";
 import TotalProperty from "@/components/TotalProperty";
 
 const Profile = () => {
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const singleUser = user?.user;
   console.log("User data in Profile component:", singleUser);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const displayName = singleUser.firstName + " " + singleUser.lastName || " Guest User";
+  const displayName =
+    singleUser.firstName + " " + singleUser.lastName || " Guest User";
 
   return (
     <div className="max-w-7xl mx-auto px-4 flex gap-6 bg-gray-100 dark:bg-gray-900">

@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation"; // Add this import
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +15,9 @@ import {
   Heart,
   MessageCircle,
   Send,
-  User,
   MoreVertical,
-  ThumbsUp,
   Reply,
-  Share2,
   Flag,
-  Smile,
   Image,
   AtSign,
   Gift,
@@ -39,7 +35,7 @@ import { ImSpinner2 } from "react-icons/im";
 
 const CommentBox = ({ blogId }) => {
   const dispatch = useDispatch();
-  const router = useRouter(); // Add router
+  const router = useRouter();
   const { user } = useSelector((state) => state.auth.user) || {};
   console.log("user in comment box", user);
   const { comments, loading } = useSelector((state) => state.comment);
@@ -49,7 +45,6 @@ const CommentBox = ({ blogId }) => {
   const [editContent, setEditContent] = useState("");
   const [replyTo, setReplyTo] = useState(null);
   const [replyText, setReplyText] = useState("");
-  const [likedComments, setLikedComments] = useState({});
   const [loadingId, setLoadingId] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -117,14 +112,6 @@ const CommentBox = ({ blogId }) => {
     return colors[index];
   };
 
-  const handleLike = (commentId) => {
-    setLikedComments((prev) => ({
-      ...prev,
-      [commentId]: !prev[commentId],
-    }));
-    toast.success(!likedComments[commentId] ? "Liked!" : "Unliked!");
-  };
-
   const handleReply = (commentId, userName) => {
     // Check authentication before allowing reply
     if (!isAuthenticated) {
@@ -136,7 +123,8 @@ const CommentBox = ({ blogId }) => {
     setReplyText(`@${userName} `);
   };
 
-  const handleReplySubmit = async (parentCommentId) => {
+  // Fixed: Removed unused parentCommentId parameter
+  const handleReplySubmit = async () => {
     if (!replyText.trim()) return;
     if (!isAuthenticated) {
       toast.error("Please login to reply");
@@ -144,6 +132,7 @@ const CommentBox = ({ blogId }) => {
       return;
     }
 
+    // Add actual reply submission logic here when needed
     toast.success("Reply posted successfully!");
     setReplyTo(null);
     setReplyText("");
@@ -215,7 +204,7 @@ const CommentBox = ({ blogId }) => {
       );
     }
   };
-   // const HandleEditSubmit = async (id) => {
+  // const HandleEditSubmit = async (id) => {
   //   try {
   //     const res = await axios.put(
   //       `http://localhost:8000/api/comment/${id}/edit`,
@@ -379,7 +368,10 @@ const CommentBox = ({ blogId }) => {
                     {isAuthenticated && (
                       <div className="absolute bottom-3 left-3 flex gap-2">
                         <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors group">
-                          <Image className="w-4 h-4 text-gray-400 group-hover:text-indigo-500" />
+                          <Image
+                            alt="Image"
+                            className="w-4 h-4 text-gray-400 group-hover:text-indigo-500"
+                          />
                         </button>
                         <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors group">
                           <AtSign className="w-4 h-4 text-gray-400 group-hover:text-indigo-500" />
@@ -679,11 +671,7 @@ const CommentBox = ({ blogId }) => {
                                       Cancel
                                     </Button>
                                     <Button
-                                      onClick={() =>
-                                        handleReplySubmit(
-                                          comment._id || comment.id,
-                                        )
-                                      }
+                                      onClick={handleReplySubmit}
                                       size="sm"
                                       className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md"
                                       disabled={

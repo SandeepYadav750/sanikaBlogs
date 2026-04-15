@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,17 +16,11 @@ import {
 import JoditEditor from "jodit-react";
 import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  togglePublishBlog,
-  fetchPublishedBlogs,
-  updateBlog,
-  deleteBlog,
-} from "@/redux/blogSlice";
+import { togglePublishBlog, updateBlog, deleteBlog } from "@/redux/blogSlice";
 import { ImSpinner2 } from "react-icons/im";
 import { FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import Image from "next/image";
-import axios from "axios";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,15 +40,13 @@ const categories = [
   "Mbile Application",
 ];
 
-const blogId = () => {
+const BlogId = () => {
   const editor = useRef(null);
   const router = useRouter();
   const params = useParams();
   const dispatch = useDispatch();
   const id = params.id;
-  const { blog, blogs, publishedBlogs, loading, message, error } = useSelector(
-    (store) => store.blog,
-  );
+  const { blog, blogs, loading, error } = useSelector((store) => store.blog);
   // Solution: Convert both to string for comparison
   const selectBlogData = blogs.find((blog) => String(blog._id) === String(id));
   // console.log("publishedBlogs", publishedBlogs);
@@ -165,9 +157,9 @@ const blogId = () => {
       toast.error(error);
 
       if (deleteBlog.fulfilled.match(result)) {
-        toast.success(result.payload.message);
         // Refresh the blog list
         router.push("/dashboard/blogs");
+        toast.success(result.payload.message);
       } else {
         toast.error(result.payload.data.message || "Failed to delete blog");
       }
@@ -416,4 +408,4 @@ const blogId = () => {
   );
 };
 
-export default blogId;
+export default BlogId;

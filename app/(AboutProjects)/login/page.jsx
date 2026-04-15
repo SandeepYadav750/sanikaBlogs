@@ -5,17 +5,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { TbEyeOff, TbEye } from "react-icons/tb";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -59,7 +56,7 @@ const Login = () => {
 
     if (isAuthenticated && user) {
       toast.success(message || "Login successfull!");
-      router.push("/");
+      router.push("/dashboard/profile");
     }
   }, [error, isAuthenticated, user, message, router]);
 

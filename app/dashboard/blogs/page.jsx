@@ -35,7 +35,7 @@ import {
 const BlogList = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { blogs, publishedBlogs, loading, message, error } = useSelector(
+  const { blogs, publishedBlogs, loading, error } = useSelector(
     (state) => state.blog,
   );
 
@@ -100,10 +100,10 @@ const BlogList = () => {
       const result = await dispatch(deleteBlog(selectedBlogId));
 
       if (deleteBlog.fulfilled.match(result)) {
-        toast.success(result.payload.message || "Blog deleted successfully");
         // Refresh both blog lists
         await dispatch(fetchAllBlogs());
         await dispatch(fetchPublishedBlogs());
+        toast.success(result.payload.message || "Blog deleted successfully");
       } else {
         toast.error(result.payload.message || "Failed to delete blog");
       }
@@ -350,7 +350,7 @@ const BlogList = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* Mobile View - Cards */}
           <div className="block lg:hidden">
-            {sortedBlogs.filter(Boolean).map((blog, index) => {
+            {sortedBlogs.filter(Boolean).map((blog) => {
               const isPublished = isBlogPublished(blog?._id);
 
               return (

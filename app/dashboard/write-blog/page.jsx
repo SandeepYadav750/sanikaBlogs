@@ -32,7 +32,7 @@ const WriteBlog = () => {
   const editor = useRef(null);
   const dispatch = useDispatch();
   const router = useRouter();
-  const { loading, message, error } = useSelector((state) => state.blog);
+  const { loading, error } = useSelector((state) => state.blog);
 
   const [blogData, setBlogData] = useState({
     title: "",
@@ -101,23 +101,31 @@ const WriteBlog = () => {
     }
   };
 
-  // const blogselectData = useSelector((state) => state.blog);
-  // console.log("blogselectData:", blogselectData);
-  // console.log("blogselectDataBlog:", blogselectData.blogs);
+  const HandleResetField = () => {
+    setBlogData({
+      title: "",
+      subtitle: "",
+      description: "",
+      category: "",
+    });
+    setImageFile(null);
+    setPreview("");
+  };
 
   return (
     <div className="min-h-[calc(100vh-80px)]">
       <div className="rounded-md border border-slate-600 bg-white dark:bg-gray-900 p-5 md:p-7 ">
         <div className="mb-5">
           <h1 className="text-3xl md:text-4xl font-bold">
-            Basic Blog Information
+            Blog Creation Information
           </h1>
           <p className="mt-2 text-sm md:text-base">
-            Makes changes to your blog here. click publish when you are done.
+            Create your blog here. Click save Button when you are done.
           </p>
           <div className="space-x-2 mt-2">
-            <Button>Publish</Button>
-            <Button variant="destructive">Remove Blog</Button>
+            <Button variant="destructive" onClick={HandleResetField}>
+              Reset Inputs
+            </Button>
           </div>
         </div>
 

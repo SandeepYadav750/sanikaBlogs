@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
@@ -11,7 +11,8 @@ const Blogs = () => {
 
   // Get state from Redux
   const { publishedBlogs } = useSelector((state) => state.blog);
-  const [hoveredCard, setHoveredCard] = useState(null);
+  // Removed unused 'hoveredCard' state since it's not being used for any functionality
+  // If you need hover effects, you can use CSS :hover instead
 
   // Fetch blogs when component mounts
   useEffect(() => {
@@ -31,7 +32,6 @@ const Blogs = () => {
       .replace(/\//g, "/");
   };
 
-  // Helper function to get author name from object or string
   // Get author initials
   const getInitials = (name) => {
     if (!name) return "A";
@@ -83,8 +83,6 @@ const Blogs = () => {
                 key={blog._id || blog.id}
                 className="group relative animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
-                onMouseEnter={() => setHoveredCard(blog._id || blog.id)}
-                onMouseLeave={() => setHoveredCard(null)}
               >
                 {/* Glow effect on hover */}
                 <div className="absolute -inset-0.5 bg-linear-to-r from-blue-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-20 blur transition duration-500"></div>
@@ -130,14 +128,14 @@ const Blogs = () => {
                           <AvatarImage src={blog.author?.photoURL} />
                           <AvatarFallback className="bg-linear-to-r from-indigo-500 to-purple-500 text-white text-lg">
                             {getInitials(
-                              blog.author?.firstName + blog.author?.lastName ||
-                                "A",
+                              (blog.author?.firstName || "") +
+                                (blog.author?.lastName || "") || "A",
                             )}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
-                            {`${blog.author?.firstName} ${blog.author?.lastName}` ||
+                            {`${blog.author?.firstName || ""} ${blog.author?.lastName || ""}`.trim() ||
                               "Anonymous Author"}
                           </h3>
                         </div>
@@ -183,7 +181,7 @@ const Blogs = () => {
                     </p>
 
                     {/* Read More Link with arrow animation */}
-                    <a
+                    <Link
                       href={`/blog/${blog._id || blog.id}`}
                       className="inline-flex items-center text-blue-600 dark:text-blue-400 font-semibold group/link hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-300"
                     >
@@ -204,7 +202,7 @@ const Blogs = () => {
                           d="M9 5l7 7-7 7"
                         />
                       </svg>
-                    </a>
+                    </Link>
 
                     {/* Reading time indicator (optional) */}
                     {blog.readingTime && (

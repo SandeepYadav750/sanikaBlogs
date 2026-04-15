@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "components/ui/label.tsx", "app/(list)/blog/[...id]/page.jsx"  ],
+, "components/ui/label.tsx", "app/(list)/blog/[...id]/page.jsx", "app/dashboard/profile/page.jsx"  ],
   "exclude": ["node_modules"]
 }

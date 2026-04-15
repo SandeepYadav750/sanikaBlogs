@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,11 +14,12 @@ import { X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { updateUser } from "@/redux/authSlice";
+import Image from "next/image";
 
 const EditProfileModal = ({ isOpen, onClose }) => {
   const { user } = useSelector((state) => state.auth.user);
   // ✅ FIXED — correct slice nameq
-  const { loading, message, error } = useSelector((state) => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
@@ -244,10 +245,12 @@ const EditProfileModal = ({ isOpen, onClose }) => {
               )}
               {imagePreview && (
                 <div className="mb-4 flex justify-center w-[50%]">
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Preview"
-                    className="w-24 h-24 rounded-full object-cover"
+                    width={96} // 24 * 4 = 96px
+                    height={96} // 24 * 4 = 96px
+                    className="rounded-full object-cover w-24 h-24"
                   />
                 </div>
               )}

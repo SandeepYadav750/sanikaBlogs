@@ -46,12 +46,6 @@ const SignUp = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // if (user.password.length < 6) {
-    //   toast.error("Password must be at least 6 characters");
-    //   return;
-    // }
-
     dispatch(registerUser(user));
   };
 
@@ -66,7 +60,7 @@ const SignUp = () => {
       toast.success(message || "Registration successfull");
       router.push("/login");
     }
-  }, [userData, router, error]);
+  }, [userData, router, error, message]);
 
   return (
     <ProtectedRoute requireAuth={false}>
