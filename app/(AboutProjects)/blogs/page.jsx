@@ -94,25 +94,30 @@ const Blogs = () => {
                   {/* Blog Image with overlay */}
                   {blog.thumbnail && blog.thumbnail !== "" && (
                     <div className="relative h-56 overflow-hidden">
-                      <Image
-                        src={blog?.thumbnail}
-                        alt={blog?.title || "Blog thumbnail"}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                        width={80}
-                        height={48}
-                        unoptimized={true}
-                      />
+                      <Link
+                        href={`/blog/${blog._id || blog.id}`}
+                        className="cursor-pointer block w-full h-full"
+                      >
+                        <Image
+                          src={blog?.thumbnail}
+                          alt={blog?.title || "Blog thumbnail"}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          width={80}
+                          height={48}
+                          unoptimized={true}
+                        />
 
-                      <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                      {/* Category badge on image */}
-                      <div className="absolute top-4 left-4 z-10">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
-                        >
-                          {blog.category || "Digital Marketing"}
-                        </span>
-                      </div>
+                        {/* Category badge on image */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
+                          >
+                            {blog.category || "Digital Marketing"}
+                          </span>
+                        </div>
+                      </Link>
                     </div>
                   )}
 
@@ -162,7 +167,7 @@ const Blogs = () => {
                     {/* Blog Title with hover effect */}
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                       <Link
-                        href={`/blog/${blog.slug || blog._id || blog.id}`}
+                        href={`/blog/${blog._id || blog.id}`}
                         className="hover:underline"
                       >
                         {blog.title}
@@ -179,7 +184,7 @@ const Blogs = () => {
 
                     {/* Read More Link with arrow animation */}
                     <a
-                      href={`/blog/${blog.slug || blog._id || blog.id}`}
+                      href={`/blog/${blog._id || blog.id}`}
                       className="inline-flex items-center text-blue-600 dark:text-blue-400 font-semibold group/link hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-300"
                     >
                       <span className="relative">

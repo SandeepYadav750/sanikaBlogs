@@ -435,7 +435,7 @@ const SingleBlog = () => {
             </div>
 
             {/* Tags Section */}
-            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+            {/* <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
               <div className="flex flex-wrap gap-2">
                 {selectedBlog.tags && selectedBlog.tags.length > 0 ? (
                   selectedBlog.tags.map((tag, index) => (
@@ -464,7 +464,7 @@ const SingleBlog = () => {
                   </>
                 )}
               </div>
-            </div>
+            </div> */}
           </article>
 
           {/* Engagement Section */}

@@ -170,7 +170,12 @@ const RecentBlogs = () => {
                   <div className="flex flex-col md:flex-row gap-6 p-6">
                     {/* Image Section */}
                     <div className="md:w-1/3 relative overflow-hidden rounded-xl">
-                      <div className="relative h-48 md:h-full w-full overflow-hidden rounded-xl">
+                      <div
+                        className="relative h-48 md:h-full w-full overflow-hidden rounded-xl cursor-pointer"
+                        onClick={() => {
+                          router.push(`/blog/${blog._id}`);
+                        }}
+                      >
                         <Image
                           src={blog.thumbnail}
                           alt={blog.title}
@@ -250,7 +255,12 @@ const RecentBlogs = () => {
                       </div>
 
                       {/* Title */}
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                      <h2
+                        className="cursor-pointer text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2"
+                        onClick={() => {
+                          router.push(`/blog/${blog._id}`);
+                        }}
+                      >
                         {blog.title}
                       </h2>
 

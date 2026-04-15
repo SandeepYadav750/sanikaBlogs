@@ -57,8 +57,7 @@ const Navbar = () => {
     }
   };
 
-  const { user, token, expiresIn, isAuthenticated, message, error, loading } =
-    useSelector((state) => state.auth);
+  const { user, error } = useSelector((state) => state.auth);
 
   const { theme } = useSelector((state) => state.theme);
 
@@ -399,7 +398,7 @@ const Navbar = () => {
                 type="text"
                 value={searchTerms}
                 onChange={(e) => setSearchTerms(e.target.value)}
-                onKeyPress={handleKeyPress}
+                // onKeyPress={handleKeyPress}
                 placeholder="Search articles..."
                 className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 pl-4 pr-10 rounded-full focus:ring-2 focus:ring-indigo-500 transition-all"
                 autoFocus
