@@ -20,19 +20,27 @@ import { useRouter } from "next/navigation";
 import JoditEditor from "jodit-react";
 import Image from "next/image";
 
-const categories = [
-  "Web Application",
-  "Web Design",
-  "SEO",
-  "Digital Application",
-  "Mobile Application",
-];
-
 const WriteBlog = () => {
   const editor = useRef(null);
   const dispatch = useDispatch();
   const router = useRouter();
   const { loading, error } = useSelector((state) => state.blog);
+
+  const { categories, totalCategories } = useSelector(
+    (state) => state.category,
+  );
+  console.log("categories in WriteBlog:", categories, totalCategories);
+  // const staticCategories = [
+  //   { _id: "1", name: "Web Development" },
+  //   { _id: "2", name: "SEO" },
+  //   { _id: "3", name: "Digital Marketing" },
+  //   { _id: "4", name: "Mobile Development" },
+  //   { _id: "5", name: "UI/UX Design" },
+  // ];
+  // // ✅ Merge + remove duplicates
+  // const categories = [
+  //   ...new Set([...(reduxCategories || []), ...staticCategories]),
+  // ];
 
   const [blogData, setBlogData] = useState({
     title: "",
@@ -184,8 +192,8 @@ const WriteBlog = () => {
                 <SelectGroup>
                   <SelectLabel>Categories</SelectLabel>
                   {categories.map((cat) => (
-                    <SelectItem value={cat} key={cat}>
-                      {cat}
+                    <SelectItem value={cat.name} key={cat._id}>
+                      {cat.name}
                     </SelectItem>
                   ))}
                 </SelectGroup>

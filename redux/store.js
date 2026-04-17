@@ -3,6 +3,7 @@ import authSlice from "./authSlice";
 import themeSlice from "./themeSlice"; // 👈 IMPORT THEME SLICE
 import blogSlice from "./blogSlice";
 import commentSlice from "./commentSlice";
+import categorySlice from "./categorySlice"; // 👈 IMPORT CATEGORY SLICE
 import {
   persistReducer,
   FLUSH,
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   theme: themeSlice, // 👈 ADD THEME SLICE TO ROOT REDUCER
   blog: blogSlice,
   comment: commentSlice,
+  category: categorySlice, // 👈 ADD CATEGORY SLICE TO ROOT REDUCER
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

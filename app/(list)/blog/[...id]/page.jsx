@@ -31,13 +31,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import CommentBox from "@/components/CommentBox";
-import {
-  fetchUserLikedBlogs,
-  toggleLikeBlog,
-} from "@/redux/blogSlice";
+import { fetchUserLikedBlogs, toggleLikeBlog } from "@/redux/blogSlice";
 
 const SingleBlog = () => {
   const params = useParams();
@@ -60,6 +57,8 @@ const SingleBlog = () => {
   const [blogLikeCount, setBlogLikeCount] = useState(0);
   // const [isLiking, setIsLiking] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
+
+  const { categories } = useSelector((state) => state.category);
 
   // Fetch blogs and user's liked blogs on mount
   useEffect(() => {
@@ -434,36 +433,21 @@ const SingleBlog = () => {
             </div>
 
             {/* Tags Section */}
-            {/* <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
               <div className="flex flex-wrap gap-2">
-                {selectedBlog.tags && selectedBlog.tags.length > 0 ? (
-                  selectedBlog.tags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                    >
-                      {tag}
-                    </Badge>
-                  ))
-                ) : (
-                  <>
-                    <Badge
-                      variant="secondary"
-                      className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                    >
-                      Nextjs
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                    >
-                      Reactjs
-                    </Badge>
-                  </>
-                )}
+                {categories.length > 0
+                  ? categories.map((cat, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {cat.name}
+                      </Badge>
+                    ))
+                  : null}
               </div>
-            </div> */}
+            </div>
           </article>
 
           {/* Engagement Section */}

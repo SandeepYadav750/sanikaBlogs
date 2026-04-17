@@ -123,11 +123,9 @@ const PopularAuthors = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
                 {author.email}
               </p>
-              {author.bio && (
-                <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-2 line-clamp-2">
-                  {author.bio}
-                </p>
-              )}
+              <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-2 line-clamp-2">
+                {author.occupation}
+              </p>
               <div className="flex gap-2 mt-3">
                 <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full">
                   {author.postCount} {author.postCount === 1 ? "post" : "posts"}

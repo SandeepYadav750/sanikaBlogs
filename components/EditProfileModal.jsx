@@ -97,7 +97,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-start md:items-center justify-center p-4">
-      <Card className=" p-2 rounded-md relative top-2 w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] max-h-[90vh] overflow-y-auto">
+      <Card className=" p-2 rounded-md relative gap-0 top-2 w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-3 border-b dark:border-gray-700">
           <div>
             <CardTitle className="text-xl">Edit Profile</CardTitle>
@@ -113,7 +113,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <CardContent className="space-y-4 p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+        <CardContent className="space-y-2 p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="firstName" className="text-sm font-medium">
@@ -200,6 +200,23 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 value={formData.twitter || ""}
                 onChange={handleInputChange}
                 placeholder="https://twitter.com/sandeep"
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <Label htmlFor="occupation" className="text-sm font-medium">
+                Occupation
+              </Label>
+              <Input
+                id="occupation"
+                name="occupation"
+                type="url"
+                value={formData.occupation || ""}
+                onChange={handleInputChange}
+                placeholder="e.g. Software Engineer, Writer, etc."
                 className="mt-1"
               />
             </div>

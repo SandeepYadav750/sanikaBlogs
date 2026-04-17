@@ -107,6 +107,7 @@ const Navbar = () => {
     { href: "/dashboard/blogs", label: "Your Blogs", icon: ImBlogger2 },
     { href: "/dashboard/comments", label: "Comments", icon: FaComments },
     { href: "/dashboard/write-blog", label: "Write Blogs", icon: FaEdit },
+    { href: "/dashboard/category", label: "Categories", icon: FaEdit },
   ];
 
   return (

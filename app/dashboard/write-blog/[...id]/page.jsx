@@ -32,13 +32,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const categories = [
-  "Web Application",
-  "Web Design",
-  "SEO",
-  "Digital Application",
-  "Mbile Application",
-];
+// const categories = [
+//   "Web Application",
+//   "Web Design",
+//   "SEO",
+//   "Digital Application",
+//   "Mbile Application",
+// ];
 
 const BlogId = () => {
   const editor = useRef(null);
@@ -49,6 +49,12 @@ const BlogId = () => {
   const { blog, blogs, loading, error } = useSelector((store) => store.blog);
   // Solution: Convert both to string for comparison
   const selectBlogData = blogs.find((blog) => String(blog._id) === String(id));
+
+  const { categories, totalCategories } = useSelector(
+    (state) => state.category,
+  );
+  console.log("categories in WriteBlog:", categories, totalCategories);
+
   // console.log("publishedBlogs", publishedBlogs);
   const [formData, setFormData] = useState({
     title: selectBlogData?.title,
@@ -151,7 +157,6 @@ const BlogId = () => {
     setIsDeleting(true);
     try {
       const result = await dispatch(deleteBlog(selectedBlogId));
-      console.log("selectedBlogId", selectedBlogId);
 
       console.log("result", result);
       toast.error(error);
@@ -278,8 +283,8 @@ const BlogId = () => {
                 <SelectGroup>
                   <SelectLabel>Categories</SelectLabel>
                   {categories.map((cat) => (
-                    <SelectItem value={cat} key={cat}>
-                      {cat}
+                    <SelectItem value={cat.name} key={cat._id}>
+                      {cat.name}
                     </SelectItem>
                   ))}
                 </SelectGroup>

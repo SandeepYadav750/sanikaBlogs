@@ -9,6 +9,9 @@ import { Input } from "./ui/input";
 
 const RecentBlogs = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth.user) || {};
+  // Check if user is authenticated
+  const isAuthenticated = !!user?._id;
   const [email, setEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState("");
   const router = useRouter();
@@ -31,6 +34,40 @@ const RecentBlogs = () => {
 
   // Get state from Redux
   const { publishedBlogs } = useSelector((state) => state.blog);
+  const { categories: reduxCAT } = useSelector((state) => state.category);
+
+  const filteredBlogs = publishedBlogs?.filter((blog) => {
+    return reduxCAT?.some(
+      (cat) => cat?.userId?._id?.toString() === blog?.author?._id?.toString(),
+    );
+  });
+  console.log("filteredBlogs:", filteredBlogs);
+  const top5Blogs = publishedBlogs?.slice(0, 5);
+  const categoryCount = (isAuthenticated ? filteredBlogs : top5Blogs).reduce(
+    (acc, blog) => {
+      const cat = blog.category;
+      if (!cat) return acc;
+      acc[cat] = (acc[cat] || 0) + 1;
+      return acc;
+    },
+    {},
+  );
+
+  const iconMap = {
+    HTML: "💻",
+    CSS: "🎨",
+    JAVASCRIPT: "📈",
+    ReactJS: "📱",
+    Tailwind: "📲",
+  };
+
+  const categories = Object.entries(categoryCount)
+    .map(([name, count]) => ({
+      name,
+      count,
+      icon: iconMap[name] || "📲",
+    }))
+    .sort((a, b) => b.count - a.count);
 
   // Fetch blogs when component mounts
   useEffect(() => {
@@ -70,7 +107,6 @@ const RecentBlogs = () => {
       category: "Marketing",
       readTime: "8 min read",
       date: "Mar 25, 2026",
-      thumbnail: "/api/placeholder/400/300",
     },
     {
       id: 2,
@@ -80,7 +116,6 @@ const RecentBlogs = () => {
       category: "Technology",
       readTime: "12 min read",
       date: "Mar 22, 2026",
-      thumbnail: "/api/placeholder/400/300",
     },
   ];
 
@@ -105,14 +140,6 @@ const RecentBlogs = () => {
     },
   ];
 
-  const categories = [
-    { name: "Web Application", count: 24, icon: "💻" }, // Globe/World Wide Web
-    { name: "Web Design", count: 42, icon: "🎨" }, // Art/Palette for design
-    { name: "SEO", count: 18, icon: "📈" }, // Growth chart for SEO
-    { name: "Digital Application", count: 12, icon: "📱" }, // Mobile/Digital device
-    { name: "Mobile Application", count: 15, icon: "📲" }, // Mobile phone with arrow
-  ];
-
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (email && email.includes("@")) {
@@ -126,8 +153,6 @@ const RecentBlogs = () => {
   };
 
   const displayBlogs = sortedBlogs.length > 0 ? sortedBlogs : defaultBlogs;
-
-  // if (!mounted) return null;
 
   return (
     <div className="border-t border-white bg-gray-100 dark:border-gray-700 dark:bg-gray-700">
@@ -173,13 +198,31 @@ const RecentBlogs = () => {
                           router.push(`/blog/${blog._id}`);
                         }}
                       >
-                        <Image
-                          src={blog.thumbnail}
-                          alt={blog.title}
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                        />
+                        {blog?.thumbnail ? (
+                          <Image
+                            src={blog?.thumbnail }
+                            alt={blog?.title}
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                          />
+                        ) : (
+                          <div className="h-48 w-80 md:h-40 md:w-60  rounded-lg bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                            <svg
+                              className="w-24 h-24 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </div>
+                        )}
                         <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
                       {/* Category Badge on Image */}
