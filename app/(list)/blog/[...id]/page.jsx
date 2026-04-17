@@ -491,7 +491,7 @@ const SingleBlog = () => {
           <CommentBox blogId={selectedBlog._id} />
 
           {/* Navigation Buttons */}
-          <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-800 flex justify-between">
+          <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-800 flex gap-2 items-center justify-between">
             <Button
               variant="outline"
               onClick={() => router.push("/dashboard/blogs")}
@@ -501,34 +501,36 @@ const SingleBlog = () => {
               Back to Blogs
             </Button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-1">
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Share this post:
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => shareBlog("twitter")}
-                className="p-2"
-              >
-                <Twitter className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => shareBlog("facebook")}
-                className="p-2"
-              >
-                <Facebook className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => shareBlog("linkedin")}
-                className="p-2"
-              >
-                <Linkedin className="w-4 h-4" />
-              </Button>
+              <div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => shareBlog("twitter")}
+                  className="p-2"
+                >
+                  <Twitter className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => shareBlog("facebook")}
+                  className="p-2"
+                >
+                  <Facebook className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => shareBlog("linkedin")}
+                  className="p-2"
+                >
+                  <Linkedin className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

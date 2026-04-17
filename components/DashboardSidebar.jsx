@@ -4,15 +4,11 @@ import { usePathname } from "next/navigation";
 import {
   FaEdit,
   FaComments,
-  FaCog,
-  FaChartLine,
   FaPlusCircle,
   FaFolderOpen,
-  FaUserCircle,
 } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { ImBlogger2 } from "react-icons/im";
-import { MdSpaceDashboard } from "react-icons/md";
 import { BiCategoryAlt } from "react-icons/bi";
 import { HiOutlineLogout } from "react-icons/hi";
 import { logoutUser } from "@/redux/authSlice";

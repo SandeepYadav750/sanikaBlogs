@@ -664,7 +664,7 @@ const BlogList = () => {
               {/* No More Content Message */}
               <div className="text-center py-6 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  🎉 You've reached the end! All your blogs are loaded.
+                  🎉 You&apos;ve reached the end! All your blogs are loaded.
                 </p>
               </div>
             </div>
