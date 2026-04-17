@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublishedBlogs } from "@/redux/blogSlice";
+import { fetchCategories } from "@/redux/categorySlice";
 import Link from "next/link";
 import { Input } from "./ui/input";
 
@@ -31,6 +32,11 @@ const RecentBlogs = () => {
       handleSearch(e);
     }
   };
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   // Get state from Redux
   const { publishedBlogs } = useSelector((state) => state.blog);

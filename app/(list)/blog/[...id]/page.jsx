@@ -35,6 +35,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import CommentBox from "@/components/CommentBox";
 import { fetchUserLikedBlogs, toggleLikeBlog } from "@/redux/blogSlice";
+import { fetchCategories } from "@/redux/categorySlice";
+
 
 const SingleBlog = () => {
   const params = useParams();
@@ -59,6 +61,11 @@ const SingleBlog = () => {
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   const { categories } = useSelector((state) => state.category);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   // Fetch blogs and user's liked blogs on mount
   useEffect(() => {
@@ -245,7 +252,8 @@ const SingleBlog = () => {
             Blog Not Found
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            The blog post you&apos;re looking for doesn&apos;t exist or has been removed.
+            The blog post you&apos;re looking for doesn&apos;t exist or has been
+            removed.
           </p>
           <Button
             onClick={() => router.push("/dashboard/blogs")}

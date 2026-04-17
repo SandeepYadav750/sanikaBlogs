@@ -15,13 +15,9 @@ const PopularAuthors = () => {
 
   // Fetch blogs and users when component mounts
   useEffect(() => {
-    if (!publishedBlogs) {
-      dispatch(fetchPublishedBlogs());
-    }
-    if (!allUsers) {
-      dispatch(getAllUsers());
-    }
-  }, [dispatch, publishedBlogs, allUsers]);
+    dispatch(fetchPublishedBlogs());
+    dispatch(getAllUsers());
+  }, [dispatch]);
 
   // Calculate popular authors using useMemo (no setState needed)
   const popularAuthors = useMemo(() => {

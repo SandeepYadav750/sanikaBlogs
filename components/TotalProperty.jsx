@@ -9,7 +9,7 @@ import { getAllComment } from "@/redux/commentSlice";
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { fetchUserLikedBlogs } from "@/redux/blogSlice";
+import { fetchAllBlogs, fetchUserLikedBlogs } from "@/redux/blogSlice";
 import {
   Eye,
   FileText,
@@ -31,7 +31,12 @@ const TotalProperty = () => {
     comments: false,
     likes: false,
   });
+
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchAllBlogs());
+  }, [dispatch]);
 
   // State for storing historical data
   const [historicalData, setHistoricalData] = useState({
