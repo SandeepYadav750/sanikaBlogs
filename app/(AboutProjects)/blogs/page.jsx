@@ -1,6 +1,8 @@
 "use client";
+
 import { useEffect } from "react";
 import Link from "next/link";
+import Head from "next/head"; // ✅ Add this import
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,8 +13,6 @@ const Blogs = () => {
 
   // Get state from Redux
   const { publishedBlogs } = useSelector((state) => state.blog);
-  // Removed unused 'hoveredCard' state since it's not being used for any functionality
-  // If you need hover effects, you can use CSS :hover instead
 
   // Fetch blogs when component mounts
   useEffect(() => {
@@ -63,8 +63,45 @@ const Blogs = () => {
     );
   };
 
+  // ✅ Meta data for Head
+  const pageTitle = "All Blogs - Sanika Blogs";
+  const pageDescription =
+    "Browse all blog posts on web development, AI, digital marketing, UI/UX design, and more.";
+  const pageUrl = "https://sanika-blogs.vercel.app/blogs";
+  const ogImage = "https://sanika-blogs.vercel.app/og-blogs.png";
+  console.log("Blogs page rendering"); // ✅ Console mein dekhna
+
   return (
     <>
+      {/* ✅ Head Component for Metadata */}
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta
+          name="keywords"
+          content="all blogs, blog listing, tech articles, programming blogs web development, AI, digital marketing"
+        />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="Sanika Blogs" />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:type" content="website" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={ogImage} />
+
+        {/* Canonical URL */}
+        <link rel="canonical" href={pageUrl} />
+      </Head>
+
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header with animation */}
         <div className="text-center mb-12 animate-fade-in">
