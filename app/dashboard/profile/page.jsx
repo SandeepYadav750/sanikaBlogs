@@ -1,5 +1,6 @@
 // THIS IS A SERVER COMPONENT - Complete SEO implementation
-import { getServerUser } from '@/lib/getServerUser';
+export const dynamic = "force-dynamic";
+import { getServerUser } from "@/lib/getServerUser";
 import Script from "next/script";
 import ProfileClient from "./ProfileClient"; // Your existing client component
 
