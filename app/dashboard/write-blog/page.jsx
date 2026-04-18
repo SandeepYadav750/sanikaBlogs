@@ -44,7 +44,7 @@ const WriteBlog = () => {
 
   const [blogData, setBlogData] = useState({
     title: "",
-    subtitle: "",
+    // subtitle: "",
     description: "",
     category: "",
   });
@@ -72,7 +72,7 @@ const WriteBlog = () => {
     // TODO: Send blogData + imageFile to your API
     const formDataApp = new FormData();
     formDataApp.append("title", blogData.title);
-    formDataApp.append("subtitle", blogData.subtitle);
+    // formDataApp.append("subtitle", blogData.subtitle);
     formDataApp.append("category", blogData.category);
     formDataApp.append("description", blogData.description);
 
@@ -83,7 +83,7 @@ const WriteBlog = () => {
 
     try {
       const result = await dispatch(createBlog(formDataApp));
-      console.log("createBlog result:", result);
+      console.log("createBlog result after Add slug:", result);
       if (createBlog.fulfilled.match(result)) {
         toast.success(result.payload.message);
         const BlogId = result.payload.blog?._id || result.payload._id;
@@ -112,7 +112,7 @@ const WriteBlog = () => {
   const HandleResetField = () => {
     setBlogData({
       title: "",
-      subtitle: "",
+      // subtitle: "",
       description: "",
       category: "",
     });
@@ -152,7 +152,7 @@ const WriteBlog = () => {
             />
           </div>
 
-          <div>
+          {/* <div>
             <Label
               htmlFor="subtitle"
               className="mb-1 block text-sm font-medium"
@@ -167,7 +167,7 @@ const WriteBlog = () => {
               placeholder="Your Blog SubTitle"
               className="w-full border-slate-600 shadow-sm"
             />
-          </div>
+          </div> */}
 
           <div>
             <Label

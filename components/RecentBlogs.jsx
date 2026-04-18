@@ -201,12 +201,12 @@ const RecentBlogs = () => {
                       <div
                         className="relative h-48 md:h-full w-full overflow-hidden rounded-xl cursor-pointer"
                         onClick={() => {
-                          router.push(`/blog/${blog._id}`);
+                          router.push(`/blog/${blog.slug}`);
                         }}
                       >
                         {blog?.thumbnail ? (
                           <Image
-                            src={blog?.thumbnail }
+                            src={blog?.thumbnail}
                             alt={blog?.title}
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
                             fill
@@ -304,17 +304,20 @@ const RecentBlogs = () => {
                       <h2
                         className="cursor-pointer text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2"
                         onClick={() => {
-                          router.push(`/blog/${blog._id}`);
+                          router.push(`/blog/${blog.slug}`);
                         }}
                       >
                         {blog.title}
                       </h2>
 
                       {/* Subtitle/Description */}
-                      <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">
+                      {/* <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">
                         {blog.subtitle ||
                           blog.description ||
                           blog.content?.substring(0, 120) + "..."}
+                      </p> */}
+                      <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">
+                        {blog.category}
                       </p>
 
                       {/* Author & Read More */}
@@ -337,7 +340,7 @@ const RecentBlogs = () => {
                         <button
                           className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold hover:gap-3 transition-all duration-300 group/btn"
                           onClick={() => {
-                            router.push(`/blog/${blog._id}`);
+                            router.push(`/blog/${blog.slug}`);
                           }}
                         >
                           Read More

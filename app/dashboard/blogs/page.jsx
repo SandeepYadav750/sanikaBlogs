@@ -43,11 +43,6 @@ const BlogList = () => {
   const [selectedBlogId, setSelectedBlogId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Create a Set of published blog IDs for quick lookup
-  const publishedBlogIds = new Set(
-    publishedBlogs?.map((blog) => blog._id) || [],
-  );
-
   // Filter blogs based on search - WITH NULL CHECK
   const filteredBlogs = blogs.filter((blog) => {
     // Skip if blog is null or undefined
@@ -63,18 +58,24 @@ const BlogList = () => {
         )
       : [];
 
-  // Check if a blog is published
-  const isBlogPublished = (blogId) => {
-    return publishedBlogIds.has(blogId);
+  // Create a Set of published blog slugs
+  const publishedBlogSlugs = new Set(
+    publishedBlogs?.map((blog) => blog.slug) || [],
+  );
+
+  // Check if a blog is published (by slug)
+  const isBlogPublished = (blogSlug) => {
+    return publishedBlogSlugs.has(blogSlug);
   };
 
-  console.log("publishedBlogs IDs:", Array.from(publishedBlogIds));
+  console.log("publishedBlogs slugs:", Array.from(publishedBlogSlugs));
   console.log(
     "All blogs:",
     sortedBlogs.map((b) => ({
       id: b._id,
+      slug: b.slug,
       title: b.title,
-      isPublished: isBlogPublished(b._id),
+      isPublished: isBlogPublished(b.slug),
     })),
   );
 
@@ -131,9 +132,11 @@ const BlogList = () => {
   };
 
   // Handle view blog - only for published blogs
-  const handleViewBlog = (blogId) => {
-    if (isBlogPublished(blogId)) {
-      router.push(`/blog/${blogId}`);
+
+  const handleViewBlog = (blogSlug) => {
+    console.log("Attempting to view blog at URL:", blogSlug);
+    if (isBlogPublished(blogSlug)) {
+      router.push(`/blog/${blogSlug}`);
     }
   };
 
@@ -194,7 +197,6 @@ const BlogList = () => {
     );
   }
 
-  
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -391,7 +393,7 @@ const BlogList = () => {
               {/* Mobile View - Cards */}
               <div className="block lg:hidden">
                 {sortedBlogs.filter(Boolean).map((blog) => {
-                  const isPublished = isBlogPublished(blog?._id);
+                  const isPublished = isBlogPublished(blog?.slug);
 
                   return (
                     <div
@@ -437,7 +439,7 @@ const BlogList = () => {
                                   : "text-gray-400 dark:text-gray-500"
                               }`}
                               onClick={() =>
-                                isPublished && handleViewBlog(blog?._id)
+                                isPublished && handleViewBlog(blog?.slug)
                               }
                             >
                               {blog?.title || "Untitled"}
@@ -457,7 +459,7 @@ const BlogList = () => {
                                     : "text-gray-400 cursor-not-allowed opacity-50"
                                 }`}
                                 onClick={() =>
-                                  isPublished && handleViewBlog(blog?._id)
+                                  isPublished && handleViewBlog(blog?.slug)
                                 }
                                 disabled={!isPublished}
                                 title={
@@ -534,7 +536,7 @@ const BlogList = () => {
 
                   <TableBody>
                     {sortedBlogs.filter(Boolean).map((blog, index) => {
-                      const isPublished = isBlogPublished(blog?._id);
+                      const isPublished = isBlogPublished(blog?.slug);
 
                       return (
                         <TableRow
@@ -584,7 +586,7 @@ const BlogList = () => {
                                   : "text-gray-400 dark:text-gray-500"
                               }`}
                               onClick={() =>
-                                isPublished && handleViewBlog(blog?._id)
+                                isPublished && handleViewBlog(blog?.slug)
                               }
                             >
                               {blog?.title || "Untitled"}
@@ -624,7 +626,7 @@ const BlogList = () => {
                                     : "text-gray-400 cursor-not-allowed opacity-50"
                                 }`}
                                 onClick={() =>
-                                  isPublished && handleViewBlog(blog?._id)
+                                  isPublished && handleViewBlog(blog?.slug)
                                 }
                                 disabled={!isPublished}
                                 title={

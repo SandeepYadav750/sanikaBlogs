@@ -93,7 +93,7 @@ const Blogs = () => {
                   {blog.thumbnail && blog.thumbnail !== "" && (
                     <div className="relative h-56 overflow-hidden">
                       <Link
-                        href={`/blog/${blog._id || blog.id}`}
+                        href={`/blog/${blog.slug}`}
                         className="cursor-pointer block w-full h-full"
                       >
                         <Image
@@ -165,7 +165,7 @@ const Blogs = () => {
                     {/* Blog Title with hover effect */}
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                       <Link
-                        href={`/blog/${blog._id || blog.id}`}
+                        href={`/blog/${blog.slug}`}
                         className="hover:underline"
                       >
                         {blog.title}
@@ -174,15 +174,17 @@ const Blogs = () => {
 
                     {/* Subtitle/Excerpt */}
                     <p className="text-gray-600 dark:text-gray-300 mb-5 line-clamp-3 text-sm leading-relaxed">
-                      {blog.subtitle ||
+                      {/* {blog.subtitle ||
                         blog.excerpt ||
                         blog.description ||
-                        "Discover the latest insights and expert tips in this comprehensive guide."}
+                        "Discover the latest insights and expert tips in this comprehensive guide."} */}
+                  
+                      {blog.category}
                     </p>
 
                     {/* Read More Link with arrow animation */}
                     <Link
-                      href={`/blog/${blog._id || blog.id}`}
+                      href={`/blog/${blog.slug}`}
                       className="inline-flex items-center text-blue-600 dark:text-blue-400 font-semibold group/link hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-300"
                     >
                       <span className="relative">

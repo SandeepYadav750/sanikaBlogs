@@ -58,7 +58,7 @@ const BlogId = () => {
   // console.log("publishedBlogs", publishedBlogs);
   const [formData, setFormData] = useState({
     title: selectBlogData?.title,
-    subtitle: selectBlogData?.subtitle,
+    // subtitle: selectBlogData?.subtitle,
     description: selectBlogData?.description,
     category: selectBlogData?.category,
   });
@@ -90,7 +90,7 @@ const BlogId = () => {
     // TODO: Send formData + imageFile to your API
     const formDataApp = new FormData();
     formDataApp.append("title", formData.title);
-    formDataApp.append("subtitle", formData.subtitle);
+    // formDataApp.append("subtitle", formData.subtitle);
     formDataApp.append("category", formData.category);
     formDataApp.append("description", formData.description);
 
@@ -243,7 +243,7 @@ const BlogId = () => {
             />
           </div>
 
-          <div>
+          {/* <div>
             <Label
               htmlFor="subtitle"
               className="mb-1 block text-sm font-medium"
@@ -258,7 +258,7 @@ const BlogId = () => {
               placeholder="Your Blog SubTitle"
               className="w-full border-slate-600 shadow-sm"
             />
-          </div>
+          </div> */}
 
           <div>
             <Label

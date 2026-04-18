@@ -128,25 +128,30 @@ const SearchList = () => {
                   {/* Blog Image with overlay */}
                   {blog.thumbnail && blog.thumbnail !== "" && (
                     <div className="relative h-56 overflow-hidden">
-                      <Image
-                        src={blog.thumbnail}
-                        alt={blog.title || "Blog thumbnail"}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                        width={400}
-                        height={300}
-                        unoptimized={true}
-                      />
+                      <Link
+                        href={`/blog/${blog.slug}`}
+                        className="cursor-pointer block w-full h-full"
+                      >
+                        <Image
+                          src={blog?.thumbnail}
+                          alt={blog?.title || "Blog thumbnail"}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          width={400}
+                          height={300}
+                          unoptimized={true}
+                        />
 
-                      <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                      {/* Category badge on image */}
-                      <div className="absolute top-4 left-4 z-10">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
-                        >
-                          {blog.category || "Digital Marketing"}
-                        </span>
-                      </div>
+                        {/* Category badge on image */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
+                          >
+                            {blog.category || "Digital Marketing"}
+                          </span>
+                        </div>
+                      </Link>
                     </div>
                   )}
 
@@ -194,7 +199,7 @@ const SearchList = () => {
                     {/* Blog Title with hover effect */}
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                       <Link
-                        href={`/blog/${blogId}`}
+                        href={`/blog/${blog.slug}`}
                         className="hover:underline"
                       >
                         {blog.title}
@@ -203,14 +208,12 @@ const SearchList = () => {
 
                     {/* Subtitle/Excerpt */}
                     <p className="text-gray-600 dark:text-gray-300 mb-5 line-clamp-3 text-sm leading-relaxed">
-                      {blog.subtitle ||
-                        blog.excerpt ||
-                        "Discover the latest insights and expert tips in this comprehensive guide."}
+                      {blog.category}
                     </p>
 
                     {/* Read More Link with arrow animation */}
                     <Link
-                      href={`/blog/${blogId}`}
+                      href={`/blog/${blog.slug}`}
                       className="inline-flex items-center text-blue-600 dark:text-blue-400 font-semibold group/link hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-300"
                     >
                       <span className="relative">

@@ -37,12 +37,11 @@ import CommentBox from "@/components/CommentBox";
 import { fetchUserLikedBlogs, toggleLikeBlog } from "@/redux/blogSlice";
 import { fetchCategories } from "@/redux/categorySlice";
 
-
 const SingleBlog = () => {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
-  const id = params?.id;
+  const slug = params?.slug;
 
   // Safely access Redux state with fallbacks
   const { likedBlogs = [], loading = false } = useSelector(
@@ -88,14 +87,15 @@ const SingleBlog = () => {
   }, [dispatch, user, initialFetchDone]);
 
   // Find blog and fetch liked status
-  useEffect(() => {
-    if (publishedBlogs && publishedBlogs.length > 0 && id) {
-      const publishedBlog = publishedBlogs.find(
-        (b) => String(b?._id) === String(id),
+   useEffect(() => {
+    if (publishedBlogs && publishedBlogs.length > 0 && slug) {
+      const foundBlog = publishedBlogs.find(
+        (b) => String(b?.slug) === String(slug)  // ← Compare slug, not _id
       );
-      setSelectedBlog(publishedBlog || null);
+      console.log("Found blog by slug:", foundBlog); // Debug
+      setSelectedBlog(foundBlog || null);
     }
-  }, [publishedBlogs, id]);
+  }, [publishedBlogs, slug]);
 
   // Update liked state based on likedBlogs from Redux
   useEffect(() => {
