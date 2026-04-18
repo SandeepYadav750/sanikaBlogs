@@ -41,6 +41,9 @@ export const loginUser = createAsyncThunk(
       // Store token in localStorage as backup
       if (res.data.token) {
         localStorage.setItem("authToken", res.data.token);
+        // Cookie mein bhi store karo (server-side ke liye)
+        // document.cookie = `authToken=${res.data.token}; path=/; max-age=604800; SameSite=Lax`;
+        // max-age=604800 = 7 days
       }
 
       return res.data;

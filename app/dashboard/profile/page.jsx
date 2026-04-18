@@ -1,84 +1,158 @@
-"use client";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { FaFacebook, FaLinkedin } from "react-icons/fa";
-import { FaSquareXTwitter, FaSquareInstagram } from "react-icons/fa6";
-import EditProfileModal from "@/components/EditProfileModal";
-import TotalProperty from "@/components/TotalProperty";
+// THIS IS A SERVER COMPONENT - Complete SEO implementation
+import { getServerUser } from '@/lib/getServerUser';
+import Script from "next/script";
+import ProfileClient from "./ProfileClient"; // Your existing client component
 
-const Profile = () => {
-  const { user } = useSelector((state) => state.auth);
-  const singleUser = user?.user;
-  console.log("User data in Profile component:", singleUser);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+// ✅ STEP 1 + STEP 4: Dynamic Metadata + Open Graph + Twitter Cards
+export async function generateMetadata() {
+  const userData = await getServerUser();
+  const user = userData?.user;
+
+  // Guest user (not logged in)
+  if (!user) {
+    return {
+      title: "Profile | Sanika Blogs",
+      description: "Login to view and manage your profile on Sanika Blogs",
+      robots: "noindex, nofollow",
+      openGraph: {
+        title: "Profile | Sanika Blogs",
+        description: "Login to manage your profile",
+        type: "website",
+      },
+      twitter: {
+        card: "summary",
+        title: "Profile | Sanika Blogs",
+        description: "Login to manage your profile",
+      },
+    };
+  }
 
   const displayName =
-    singleUser.firstName + " " + singleUser.lastName || " Guest User";
+    `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User";
+  const profileUrl = "https://sanika-blogs.vercel.app/dashboard/profile";
+
+  return {
+    title: `${displayName} - Profile | Sanika Blogs`,
+    description: user.bio || `Profile of ${displayName} on Sanika Blogs`,
+    authors: [{ name: displayName, url: profileUrl }],
+
+    // STEP 4: Open Graph (Facebook, LinkedIn, WhatsApp)
+    openGraph: {
+      title: `${displayName} - Profile`,
+      description: user.bio || `View ${displayName}'s profile and blogs`,
+      url: profileUrl,
+      siteName: "Sanika Blogs",
+      images: user.photoURL
+        ? [
+            {
+              url: user.photoURL,
+              width: 800,
+              height: 600,
+              alt: `${displayName}'s profile photo`,
+            },
+          ]
+        : ["/user.jpg"],
+      type: "profile",
+      profile: {
+        username: displayName,
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+      },
+    },
+
+    // STEP 4: Twitter Cards
+    twitter: {
+      card: "summary_large_image",
+      title: `${displayName} - Profile`,
+      description: user.bio || `View ${displayName}'s profile`,
+      images: user.photoURL ? [user.photoURL] : ["/user.jpg"],
+      creator:
+        user.twitter?.replace("https://twitter.com/", "@") || "@sanikablogs",
+    },
+
+    // SEO additional
+    robots: {
+      index: false, // Profile pages shouldn't be indexed
+      follow: false,
+    },
+    alternates: {
+      canonical: profileUrl,
+    },
+  };
+}
+
+// ✅ STEP 14: Dynamic Schema Markup (Same page mein)
+export default async function ProfilePage() {
+  const userData = await getServerUser();
+  const user = userData?.user;
+
+  // Schema for logged-in user
+  const profileSchema = user
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        description: user.bio,
+        url: "https://sanika-blogs.vercel.app/dashboard/profile",
+        dateCreated: user.createdAt || new Date().toISOString(),
+        dateModified: new Date().toISOString(),
+        mainEntity: {
+          "@type": "Person",
+          name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+          email: user.email,
+          image: user.photoURL,
+          jobTitle: user.occupation,
+          sameAs: [
+            user.facebook,
+            user.twitter,
+            user.linkedin,
+            user.instagram,
+          ].filter((social) => social && social !== ""),
+          description: user.bio,
+        },
+      }
+    : null;
+
+  // Breadcrumb Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://sanika-blogs.vercel.app/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Profile",
+        item: "https://sanika-blogs.vercel.app/dashboard/profile",
+      },
+    ],
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 flex gap-6 bg-gray-100 dark:bg-gray-900">
-      <main className="flex-1 space-y-6">
-        <Card className="flex flex-col sm:flex-row items-center gap-6 p-6">
-          <div className="flex flex-col items-center gap-2">
-            <Avatar className="w-28 h-28">
-              <AvatarImage src={singleUser.photoURL || "/avatar.png"} />
-              <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <span>{singleUser.occupation}</span>
-            <div className="flex items-center justify-center gap-2 text-xl w-full">
-              <Link href={singleUser.facebook} target="_blank">
-                <FaFacebook />
-              </Link>
-              <Link href={singleUser.twitter} target="_blank">
-                <FaSquareXTwitter />
-              </Link>
-              <Link href={singleUser.linkedin} target="_blank">
-                <FaLinkedin />
-              </Link>
-              <Link href={singleUser.instagram} target="_blank">
-                <FaSquareInstagram />
-              </Link>
-            </div>
-          </div>
-          <div className="flex-1 ">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome {displayName || "N/A"}
-            </h2>
-            <p className="my-2 text-sm text-gray-600 dark:text-gray-300">
-              Email : {singleUser.email || "N/A"}
-            </p>
-            <p className="text-sm text-gray-700 dark:text-gray-200">
-              <span className="font-medium">About Me:</span>
-            </p>
-            <div className=" p-4 bg-gray-200 dark:bg-gray-800 rounded">
-              <p className="text-sm text-gray-700 dark:text-gray-200">
-                {singleUser.bio}
-              </p>
-            </div>
-            <Button onClick={() => setIsEditModalOpen(true)} className="mt-4">
-              Edit Profile
-            </Button>
-          </div>
-        </Card>
-
-        <TotalProperty />
-      </main>
-
-      <EditProfileModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        // initialData={singleUser}
-        // onSave={(data: any) => {
-        //   console.log("Profile updated:", data);
-        //   dispatch(setUser(data));
-        // }}
+    <>
+      {/* STEP 14: JSON-LD Schema Scripts */}
+      {profileSchema && (
+        <Script
+          id="profile-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema) }}
+          strategy="afterInteractive"
+        />
+      )}
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        strategy="afterInteractive"
       />
-    </div>
-  );
-};
 
-export default Profile;
+      {/* Your existing client component */}
+      <ProfileClient />
+    </>
+  );
+}

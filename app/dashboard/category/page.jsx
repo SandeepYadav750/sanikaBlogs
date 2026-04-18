@@ -141,13 +141,13 @@ const Category = () => {
       : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="mb-8 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Category Management
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm md:text-base">
@@ -168,7 +168,7 @@ const Category = () => {
           {/* Add Category Form */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
+              <div className="bg-linear-to-r from-blue-500 to-purple-600 px-6 py-4">
                 <h2 className="text-white font-semibold text-lg flex items-center gap-2">
                   <svg
                     className="w-5 h-5"
@@ -203,7 +203,7 @@ const Category = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-linear-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? "Adding..." : "Add Category"}
                 </button>
@@ -312,7 +312,7 @@ const Category = () => {
                       >
                         <div className="flex items-center justify-between flex-wrap gap-3">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold uppercase">
+                            <div className="w-10 h-10 rounded-full bg-linear-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold uppercase">
                               {category.name ? category.name.charAt(0) : "?"}
                             </div>
                             {editingId === category._id ? (
