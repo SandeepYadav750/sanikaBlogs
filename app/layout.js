@@ -19,6 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Sanika Blogs",
   description: "A blogging platform built with Next.js and Tailwind CSS",
+  verification: {
+    google: "RP0vRtcsn9giH12SZaTZo1jvVvsewweZooDTkr1ZZMA",
+  },
 };
 
 export default function RootLayout({ children }) {

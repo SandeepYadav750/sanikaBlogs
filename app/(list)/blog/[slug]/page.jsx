@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import Head from "next/head"; // ✅ Add this import
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -107,6 +106,83 @@ const SingleBlog = () => {
       setBlogLikeCount(selectedBlog.likes?.length || 0);
     }
   }, [selectedBlog, user, likedBlogs]);
+
+  // HTML se text nikalne ka function
+  const getPlainTextFromHTML = (htmlString) => {
+    if (!htmlString) return "";
+
+    // Browser environment me kaam karega
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlString;
+    return tempDiv.textContent || tempDiv.innerText || "";
+  };
+
+  useEffect(() => {
+    if (!selectedBlog) return;
+
+    const authorName =
+      selectedBlog.author?.firstName && selectedBlog.author?.lastName
+        ? `${selectedBlog.author.firstName} ${selectedBlog.author.lastName}`
+        : "Sanika Blogs";
+    const pageTitle = `${selectedBlog.title} | Sanika Blogs`;
+    const pageDescription =
+      getPlainTextFromHTML(selectedBlog.description)?.substring(0, 160) ||
+      "Read this insightful blog post on Sanika Blogs.";
+    const pageUrl = `https://sanika-blogs.vercel.app/blog/${slug}`;
+    const ogImage =
+      selectedBlog.thumbnail ||
+      "https://sanika-blogs.vercel.app/og-default.png";
+
+    // Set title
+    document.title = pageTitle;
+
+    // Update or create meta tags
+    const setMetaTag = (name, content, isProperty = false) => {
+      let selector = isProperty
+        ? `meta[property="${name}"]`
+        : `meta[name="${name}"]`;
+      let meta = document.querySelector(selector);
+      if (!meta) {
+        meta = document.createElement("meta");
+        if (isProperty) {
+          meta.setAttribute("property", name);
+        } else {
+          meta.setAttribute("name", name);
+        }
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute("content", content);
+    };
+
+    setMetaTag("description", pageDescription);
+    setMetaTag(
+      "keywords",
+      `${selectedBlog.category || "blog"}, blogging, tech articles, ${selectedBlog.title}`,
+    );
+    setMetaTag("author", authorName);
+
+    // Open Graph
+    setMetaTag("og:title", selectedBlog.title, true);
+    setMetaTag("og:description", pageDescription, true);
+    setMetaTag("og:url", pageUrl, true);
+    setMetaTag("og:image", ogImage, true);
+    setMetaTag("og:type", "article", true);
+
+    // Twitter
+    setMetaTag("twitter:card", "summary_large_image");
+    setMetaTag("twitter:title", selectedBlog.title);
+    setMetaTag("twitter:description", pageDescription);
+    setMetaTag("twitter:image", ogImage);
+
+    // Canonical
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", pageUrl);
+  }, [selectedBlog, slug]);
 
   // Calculate reading time
   const getReadingTime = (content) => {
@@ -267,66 +343,8 @@ const SingleBlog = () => {
     return null;
   }
 
-  // ✅ Generate dynamic meta data for Head
-  const authorName =
-    selectedBlog.author?.firstName && selectedBlog.author?.lastName
-      ? `${selectedBlog.author.firstName} ${selectedBlog.author.lastName}`
-      : "Sanika Blogs";
-
-  const pageTitle = `${selectedBlog.title} | Sanika Blogss`;
-  const pageDescription =
-    selectedBlog.description?.substring(0, 160) ||
-    "Read this insightful blog post on Sanika Blogs.";
-  const pageUrl = `https://sanika-blogs.vercel.app/blog/${slug}`;
-  const ogImage =
-    selectedBlog.thumbnail || "https://sanika-blogs.vercel.app/og-default.png";
-
   return (
     <>
-      {/* ✅ Dynamic Head Metadata */}
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta
-          name="keywords"
-          content={`${selectedBlog.category || "blog"}, blogging, tech articles, ${selectedBlog.title}`}
-        />
-        <meta name="author" content={authorName} />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:title" content={selectedBlog.title} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={pageUrl} />
-        <meta property="og:site_name" content="Sanika Blogs" />
-        <meta property="og:image" content={ogImage} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:type" content="article" />
-        <meta
-          property="article:published_time"
-          content={selectedBlog.createdAt}
-        />
-        <meta
-          property="article:modified_time"
-          content={selectedBlog.updatedAt}
-        />
-        <meta property="article:author" content={authorName} />
-        <meta
-          property="article:tag"
-          content={selectedBlog.category || "blog"}
-        />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={selectedBlog.title} />
-        <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content={ogImage} />
-        <meta name="twitter:site" content="@sanikablogs" />
-
-        {/* Canonical URL */}
-        <link rel="canonical" href={pageUrl} />
-      </Head>
-
       <div className="bg-gray-200 min-h-screen dark:bg-gray-900 pb-2">
         <div className="bg-white dark:bg-gray-900 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 rounded-lg">
           {/* Breadcrumb */}
@@ -489,7 +507,9 @@ const SingleBlog = () => {
               <div className="text-gray-700 dark:text-gray-300 leading-relaxed space-y-6">
                 {selectedBlog.description ? (
                   <div
-                    dangerouslySetInnerHTML={{ __html: selectedBlog.description }}
+                    dangerouslySetInnerHTML={{
+                      __html: selectedBlog.description,
+                    }}
                   />
                 ) : (
                   <p>Content Coming Soon...</p>
