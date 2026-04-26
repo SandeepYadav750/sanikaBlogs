@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Provider from "./provider";
 import ThemeProvider from "../components/ThemeProviders";
 import Footer from "../components/Footer";
+import GoogleAnalytics from "../components/GoogleAnalytics";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +38,7 @@ export default function RootLayout({ children }) {
             <div className="SandeepYadav">{children}</div>
             <Footer />
           </ThemeProvider>
+          <GoogleAnalytics />
         </Provider>
       </body>
     </html>
