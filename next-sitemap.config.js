@@ -1,17 +1,16 @@
 /** @type {import('next-sitemap').IConfig} */
 
+const axios = require("axios");
+
 async function getAllBlogSlugs() {
   try {
     const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    const res = await fetch(`${API}/blog/get-published-blogs`);
+    const res = await axios.get(`${API}/blog/get-published-blogs`, {
+      withCredentials: false,
+    });
 
-    if (!res.ok) return [];
-
-    const data = await res.json();
-
-    if (data && data.blogs && Array.isArray(data.blogs)) {
-      // ✅ Date ke hisaab se sort karo (latest first)
-      const sortedBlogs = data.blogs.sort(
+    if (res.data && res.data.blogs && Array.isArray(res.data.blogs)) {
+      const sortedBlogs = res.data.blogs.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
 
@@ -32,29 +31,42 @@ module.exports = {
   siteUrl: "https://sanika-blogs.vercel.app",
   outDir: "./public",
   generateRobotsTxt: false,
-
-  exclude: ["/dashboard/*", "/api/*", "/login", "/signUp", "/searchList/*"],
+  
+  // ✅ IMPORTANT: 50,000 se upar rakho taaki split na ho
+  sitemapSize: 50000,
+  
+  // ✅ Yeh ensure karega ki sirf EK file bane
+  generateIndexSitemap: false,  // ← YEH LINE ADD KARO (most important!)
+  
+  // ✅ Sirf yeh paths exclude karo
+  exclude: [
+    "/dashboard/*", 
+    "/api/*", 
+    "/login", 
+    "/signUp", 
+    "/searchList/*",
+    "/_not-found"  // add this too
+  ],
 
   additionalPaths: async () => {
     const blogs = await getAllBlogSlugs();
+    console.log(`📝 Found ${blogs.length} blogs for sitemap`);
 
-    // ✅ Har blog ki priority uski date ke hisaab se
     return blogs.map((blog, index) => {
-      // Latest 5 blogs ko highest priority
-      let priority = 0.8; // default
+      let priority = 0.8;
       let changefreq = "weekly";
 
       if (index < 10) {
-        priority = 1.0; // ✅ Latest 10 blogs - Highest priority
-        changefreq = "hourly"; // ✅ hourly crawl
+        priority = 1.0;
+        changefreq = "daily";  // "hourly" se "daily" karo (Google hourly ignore karta hai)
       } else if (index < 20) {
-        priority = 1.0; // ✅ Latest 20 blogs - Highest priority
-        changefreq = "daily"; // ✅ Daily crawl
+        priority = 1.0;
+        changefreq = "daily";
       } else if (index < 40) {
-        priority = 0.9; // ✅ Next 40 blogs - High priority
+        priority = 0.9;
         changefreq = "daily";
       } else {
-        priority = 0.8; // ✅ Old blogs - Normal priority
+        priority = 0.8;
         changefreq = "weekly";
       }
 
@@ -67,22 +79,40 @@ module.exports = {
     });
   },
 
+  // ✅ Transform default paths (already handled)
   transform: async (config, path) => {
-    // Homepage - Highest priority
     if (path === "/") {
-      return { loc: path, priority: 1.0, changefreq: "daily" };
+      return { 
+        loc: path, 
+        priority: 1.0, 
+        changefreq: "daily",
+        lastmod: new Date().toISOString()
+      };
     }
 
-    // Blog pages - Already handled in additionalPaths
-    if (path.startsWith("/blog/")) {
-      return { loc: path, priority: 0.9, changefreq: "daily" };
-    }
-
-    // About page - Low priority
     if (path === "/about") {
-      return { loc: path, priority: 0.5, changefreq: "monthly" };
+      return { 
+        loc: path, 
+        priority: 0.5, 
+        changefreq: "monthly",
+        lastmod: new Date().toISOString()
+      };
     }
 
-    return { loc: path, priority: 0.5, changefreq: "monthly" };
+    if (path === "/blogs") {
+      return { 
+        loc: path, 
+        priority: 0.9, 
+        changefreq: "daily",
+        lastmod: new Date().toISOString()
+      };
+    }
+
+    return { 
+      loc: path, 
+      priority: 0.5, 
+      changefreq: "monthly",
+      lastmod: new Date().toISOString()
+    };
   },
 };
