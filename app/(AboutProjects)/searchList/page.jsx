@@ -207,9 +207,12 @@ const SearchList = () => {
                     </h2>
 
                     {/* Subtitle/Excerpt */}
-                    <p className="text-gray-600 dark:text-gray-300 mb-5 line-clamp-3 text-sm leading-relaxed">
-                      {blog.category}
-                    </p>
+                    <p
+                      className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2"
+                      dangerouslySetInnerHTML={{
+                        __html: blog.description?.substring(0, 120) + "...",
+                      }}
+                    />
 
                     {/* Read More Link with arrow animation */}
                     <Link

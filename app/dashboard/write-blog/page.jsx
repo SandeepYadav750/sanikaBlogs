@@ -44,7 +44,7 @@ const WriteBlog = () => {
 
   const [blogData, setBlogData] = useState({
     title: "",
-    // subtitle: "",
+    keywords: "",
     description: "",
     category: "",
   });
@@ -72,7 +72,7 @@ const WriteBlog = () => {
     // TODO: Send blogData + imageFile to your API
     const formDataApp = new FormData();
     formDataApp.append("title", blogData.title);
-    // formDataApp.append("subtitle", blogData.subtitle);
+    formDataApp.append("keywords", blogData.keywords);
     formDataApp.append("category", blogData.category);
     formDataApp.append("description", blogData.description);
 
@@ -112,7 +112,7 @@ const WriteBlog = () => {
   const HandleResetField = () => {
     setBlogData({
       title: "",
-      // subtitle: "",
+      keywords: "",
       description: "",
       category: "",
     });
@@ -152,22 +152,22 @@ const WriteBlog = () => {
             />
           </div>
 
-          {/* <div>
+          <div>
             <Label
-              htmlFor="subtitle"
+              htmlFor="keywords"
               className="mb-1 block text-sm font-medium"
             >
-              SubTitle
+              Keywords
             </Label>
             <Input
-              id="subtitle"
-              name="subtitle"
-              value={blogData.subtitle || ""}
+              id="keywords"
+              name="keywords"
+              value={blogData.keywords || ""}
               onChange={handleInputChange}
-              placeholder="Your Blog SubTitle"
+              placeholder="Your Blog keywords"
               className="w-full border-slate-600 shadow-sm"
             />
-          </div> */}
+          </div>
 
           <div>
             <Label

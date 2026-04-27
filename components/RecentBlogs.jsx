@@ -311,14 +311,12 @@ const RecentBlogs = () => {
                       </h2>
 
                       {/* Subtitle/Description */}
-                      {/* <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">
-                        {blog.subtitle ||
-                          blog.description ||
-                          blog.content?.substring(0, 120) + "..."}
-                      </p> */}
-                      <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">
-                        {blog.category}
-                      </p>
+                      <p
+                        className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2"
+                        dangerouslySetInnerHTML={{
+                          __html: blog.description?.substring(0, 120) + "...",
+                        }}
+                      />
 
                       {/* Author & Read More */}
                       <div className="flex items-center justify-between mt-auto">
@@ -376,7 +374,7 @@ const RecentBlogs = () => {
             </div>
 
             {/* Suggested Blogs Section - Modern Grid */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100 dark:border-gray-700">
+            {/* <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100 dark:border-gray-700">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <span className="text-3xl">✨</span> Suggested for You
@@ -427,7 +425,7 @@ const RecentBlogs = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Right Column - Sidebar */}
@@ -575,14 +573,6 @@ const RecentBlogs = () => {
             </div>
           </aside>
         </div>
-
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700 text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            © 2026 BlogSphere — Fresh perspectives on tech, creativity, and
-            growth.
-          </p>
-        </footer>
       </div>
 
       {/* Custom Animations */}

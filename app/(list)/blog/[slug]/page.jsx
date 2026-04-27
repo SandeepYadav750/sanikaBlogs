@@ -157,7 +157,7 @@ const SingleBlog = () => {
     setMetaTag("description", pageDescription);
     setMetaTag(
       "keywords",
-      `${selectedBlog.category || "blog"}, blogging, tech articles, ${selectedBlog.title}`,
+      `${selectedBlog.keywords}, ${selectedBlog.category || "blog"}, blogging, articles, sanika blogs, ${selectedBlog.title}`,
     );
     setMetaTag("author", authorName);
 
@@ -486,13 +486,13 @@ const SingleBlog = () => {
 
             {/* Feature Image */}
             {selectedBlog.thumbnail ? (
-              <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+              <div className="w-full md:h-100 mb-8 rounded-xl overflow-hidden shadow-lg">
                 <Image
                   src={selectedBlog.thumbnail}
                   alt={selectedBlog.title}
                   width={800}
                   height={400}
-                  className="w-full h-auto object-cover"
+                  className="w-full h-full"
                   priority
                 />
               </div>

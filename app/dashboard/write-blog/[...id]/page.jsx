@@ -58,7 +58,7 @@ const BlogId = () => {
   // console.log("publishedBlogs", publishedBlogs);
   const [formData, setFormData] = useState({
     title: selectBlogData?.title,
-    // subtitle: selectBlogData?.subtitle,
+    keywords: selectBlogData?.keywords,
     description: selectBlogData?.description,
     category: selectBlogData?.category,
   });
@@ -90,7 +90,7 @@ const BlogId = () => {
     // TODO: Send formData + imageFile to your API
     const formDataApp = new FormData();
     formDataApp.append("title", formData.title);
-    // formDataApp.append("subtitle", formData.subtitle);
+    formDataApp.append("keywords", formData.keywords);
     formDataApp.append("category", formData.category);
     formDataApp.append("description", formData.description);
 
@@ -177,7 +177,7 @@ const BlogId = () => {
     }
   };
 
-  if (!blogs || !blog) {
+  if (!blogs) {
     return <div>Loading...</div>;
   }
 
@@ -243,22 +243,22 @@ const BlogId = () => {
             />
           </div>
 
-          {/* <div>
+          <div>
             <Label
-              htmlFor="subtitle"
+              htmlFor="keywords"
               className="mb-1 block text-sm font-medium"
             >
-              SubTitle
+              Keywords
             </Label>
             <Input
-              id="subtitle"
-              name="subtitle"
-              value={formData.subtitle || ""}
+              id="keywords"
+              name="keywords"
+              value={formData.keywords || ""}
               onChange={handleInputChange}
-              placeholder="Your Blog SubTitle"
+              placeholder="Your Blog keywords"
               className="w-full border-slate-600 shadow-sm"
             />
-          </div> */}
+          </div>
 
           <div>
             <Label
