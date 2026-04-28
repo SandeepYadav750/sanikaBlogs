@@ -1,15 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  FaEdit,
-  FaComments,
-  FaPlusCircle,
-  FaFolderOpen,
-} from "react-icons/fa";
+import { FaEdit, FaComments, FaPlusCircle, FaFolderOpen } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { ImBlogger2 } from "react-icons/im";
-import { BiCategoryAlt } from "react-icons/bi";
+import { BiCategory } from "react-icons/bi";
 import { HiOutlineLogout } from "react-icons/hi";
 import { logoutUser } from "@/redux/authSlice";
 import { useDispatch } from "react-redux";
@@ -73,7 +68,7 @@ const DashboardSidebar = () => {
     },
     {
       href: "/dashboard/category",
-      icon: <BiCategoryAlt className="text-xl" />,
+      icon: <BiCategory className="text-xl" />,
       label: "Categories",
     },
   ];
