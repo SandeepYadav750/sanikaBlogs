@@ -2,6 +2,9 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 
+export const dynamic = "force-dynamic"; // Force dynamic rendering
+export const revalidate = 0; // Disable caching completely
+
 const API = process.env.NEXT_PUBLIC_API_URL;
 
 export async function GET() {
@@ -16,11 +19,7 @@ export async function GET() {
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
       <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
-              xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" 
-              xmlns:xhtml="http://www.w3.org/1999/xhtml" 
-              xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" 
-              xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" 
-              xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+              xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
         <!-- Homepage -->
         <url>
           <loc>https://sanika-blogs.vercel.app/</loc>
@@ -29,7 +28,6 @@ export async function GET() {
           <priority>1.0</priority>
         </url>
         
-        <!-- Blogs About -->
         <url>
           <loc>https://sanika-blogs.vercel.app/about</loc>
           <lastmod>${currentDate}</lastmod>
@@ -37,7 +35,6 @@ export async function GET() {
           <priority>0.5</priority>
         </url>
 
-        <!-- Blogs SEARCHLIST -->
         <url>
           <loc>https://sanika-blogs.vercel.app/searchList</loc>
           <lastmod>${currentDate}</lastmod>
@@ -45,7 +42,6 @@ export async function GET() {
           <priority>0.5</priority>
         </url>
 
-        <!-- Blogs Listing -->
         <url>
           <loc>https://sanika-blogs.vercel.app/blogs</loc>
           <lastmod>${currentDate}</lastmod>
@@ -54,7 +50,9 @@ export async function GET() {
         </url>
 
         <!-- All Blog Posts -->
-        ${blogs.map((blog) => `
+        ${blogs
+          .map(
+            (blog) => `
         <url>
           <loc>https://sanika-blogs.vercel.app/blog/${blog.slug}</loc>
           <lastmod>${blog.updatedAt ? new Date(blog.updatedAt).toISOString() : currentDate}</lastmod>
@@ -74,34 +72,19 @@ export async function GET() {
           .join("")}
       </urlset>`;
 
+    // CRITICAL: Disable caching in production
     return new NextResponse(sitemap, {
       headers: {
         "Content-Type": "text/xml",
-        "Cache-Control": "public, s-maxage=600, stale-while-revalidate=60",
+        "Cache-Control": "no-cache, no-store, must-revalidate", // Disable cache
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
   } catch (error) {
     console.error("Sitemap generation error:", error);
 
-    const fallbackSitemap = `<?xml version="1.0" encoding="UTF-8"?>
-      <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
-              xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" 
-              xmlns:xhtml="http://www.w3.org/1999/xhtml" 
-              xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" 
-              xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" 
-              xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-        <url>
-          <loc>https://sanika-blogs.vercel.app/</loc>
-          <lastmod>${new Date().toISOString()}</lastmod>
-          <changefreq>daily</changefreq>
-          <priority>1.0</priority>
-        </url>
-      </urlset>`;
-
-    return new NextResponse(fallbackSitemap, {
-      headers: {
-        "Content-Type": "text/xml",
-      },
-    });
+    // Don't return fallback - throw error to force fresh generation
+    throw new Error(`Sitemap generation failed: ${error.message}`);
   }
 }
