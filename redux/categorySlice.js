@@ -3,6 +3,22 @@ import axios from "axios";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
+// Fetch all All Users categories
+export const fetchAllUsersCategories = createAsyncThunk(
+  "category/fetchAllUsersCategories",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API}/category/allUsersCategories`, {
+        withCredentials: false,
+      });
+      console.log("allUsersCategories:", response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
 // Fetch all categories
 export const fetchCategories = createAsyncThunk(
   "category/fetchCategories",
@@ -82,6 +98,7 @@ const categorySlice = createSlice({
   name: "category",
   initialState: {
     categories: [],
+    allUsersCategories: [],
     loading: false,
     error: null,
     totalCategories: 0,
@@ -110,6 +127,27 @@ const categorySlice = createSlice({
         state.error = null;
       })
       .addCase(fetchCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || "Failed to fetch categories";
+      })
+
+      // Fetch All Users Categories
+      .addCase(fetchAllUsersCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      // In your categorySlice.js, update the fetchAllUsersCategories.fulfilled case:
+      .addCase(fetchAllUsersCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        // Filter out any null values
+        state.allUsersCategories = (action.payload.categories || []).filter(
+          (cat) => cat && cat._id,
+        );
+        state.totalCategories =
+          action.payload.totalCategories || state.allUsersCategories.length;
+        state.error = null;
+      })
+      .addCase(fetchAllUsersCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Failed to fetch categories";
       })

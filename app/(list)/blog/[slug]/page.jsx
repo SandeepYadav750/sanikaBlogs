@@ -35,7 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import CommentBox from "@/components/CommentBox";
 import { fetchUserLikedBlogs, toggleLikeBlog } from "@/redux/blogSlice";
-import { fetchCategories } from "@/redux/categorySlice";
+import { fetchAllUsersCategories } from "@/redux/categorySlice";
 
 const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
 
@@ -50,8 +50,8 @@ const SingleBlog = () => {
     (store) => store.blog || {},
   );
   const publishedBlogs = useSelector((state) => state.blog.publishedBlogs);
-
   const { user } = useSelector((state) => state.auth.user || {});
+  const { allUsersCategories } = useSelector((state) => state.category);
 
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [saved, setSaved] = useState(false);
@@ -60,11 +60,17 @@ const SingleBlog = () => {
   const [blogLikeCount, setBlogLikeCount] = useState(0);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const { categories } = useSelector((state) => state.category);
+  const userIDs = selectedBlog?.author?._id || [];
+
+  // Filter categories where userId._id matches any user ID
+  const relatedCategories =
+    allUsersCategories?.filter((category) =>
+      userIDs.includes(category?.userId?._id),
+    ) || [];
 
   // Fetch categories on component mount
   useEffect(() => {
-    dispatch(fetchCategories());
+    dispatch(fetchAllUsersCategories());
   }, [dispatch]);
 
   // Fetch blogs and user's liked blogs on mount
@@ -131,9 +137,7 @@ const SingleBlog = () => {
       getPlainTextFromHTML(selectedBlog.description)?.substring(0, 160) ||
       "Read this insightful blog post on Sanika Blogs.";
     const pageUrl = `${FRONT_API}/blog/${slug}`;
-    const ogImage =
-      selectedBlog.thumbnail ||
-      `${FRONT_API}/og-default.png`;
+    const ogImage = selectedBlog.thumbnail || `${FRONT_API}/og-default.png`;
 
     // Set title
     document.title = pageTitle;
@@ -521,9 +525,12 @@ const SingleBlog = () => {
               {/* Tags Section */}
               <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
                 <div className="flex flex-wrap gap-2">
-                  {categories.length > 0
-                    ? categories.map((cat, index) => (
+                  {relatedCategories.length > 0
+                    ? relatedCategories.map((cat, index) => (
                         <Badge
+                          onClick={() =>
+                            router.push(`/searchList?q=${cat.name}`)
+                          }
                           key={index}
                           variant="secondary"
                           className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
