@@ -8,6 +8,8 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublishedBlogs } from "@/redux/blogSlice";
 
+const FRONT_API = process.env.NEXT_FRONTEND_API_URL
+
 const Blogs = () => {
   const dispatch = useDispatch();
 
@@ -24,8 +26,8 @@ const Blogs = () => {
   //   const pageTitle = "All Blogs - Sanika Blogs";
   //   const pageDescription =
   //     "Browse all blog posts on web development, AI, digital marketing, UI/UX design, and more.";
-  //   const pageUrl = "https://sanika-blogs.vercel.app/blogs";
-  //   const ogImage = "https://sanika-blogs.vercel.app/og-blogs.png";
+  //   const pageUrl = FRONT_API + "/blogs";
+  //   const ogImage = FRONT_API + "/og-blogs.png";
 
   //   // Set document title
   //   document.title = pageTitle;

@@ -4,6 +4,8 @@ import { getServerUser } from "@/lib/getServerUser";
 import Script from "next/script";
 import ProfileClient from "./ProfileClient"; // Your existing client component
 
+const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
+
 // ✅ STEP 1 + STEP 4: Dynamic Metadata + Open Graph + Twitter Cards
 export async function generateMetadata() {
   const userData = await getServerUser();
@@ -30,7 +32,7 @@ export async function generateMetadata() {
 
   const displayName =
     `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User";
-  const profileUrl = "https://sanika-blogs.vercel.app/dashboard/profile";
+  const profileUrl = `${FRONT_API}/dashboard/profile`;
 
   return {
     title: `${displayName} - Profile | Sanika Blogs`,
@@ -94,7 +96,7 @@ export default async function ProfilePage() {
         "@type": "ProfilePage",
         name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
         description: user.bio,
-        url: "https://sanika-blogs.vercel.app/dashboard/profile",
+        url: `${FRONT_API}/dashboard/profile`,
         dateCreated: user.createdAt || new Date().toISOString(),
         dateModified: new Date().toISOString(),
         mainEntity: {
@@ -123,13 +125,13 @@ export default async function ProfilePage() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://sanika-blogs.vercel.app/",
+        item: `${FRONT_API}/`,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Profile",
-        item: "https://sanika-blogs.vercel.app/dashboard/profile",
+        item: `${FRONT_API}/dashboard/profile`,
       },
     ],
   };

@@ -6,6 +6,8 @@ export const dynamic = "force-dynamic"; // Force dynamic rendering
 export const revalidate = 0; // Disable caching completely
 
 const API = process.env.NEXT_PUBLIC_API_URL;
+const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
+
 
 export async function GET() {
   try {
@@ -19,31 +21,35 @@ export async function GET() {
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
       <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
-              xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+              xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" 
+              xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+              xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" 
+              xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" 
+              xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
         <!-- Homepage -->
         <url>
-          <loc>https://sanika-blogs.vercel.app/</loc>
+          <loc>${FRONT_API}/</loc>
           <lastmod>${currentDate}</lastmod>
           <changefreq>daily</changefreq>
           <priority>1.0</priority>
         </url>
         
         <url>
-          <loc>https://sanika-blogs.vercel.app/about</loc>
+          <loc>${FRONT_API}/about</loc>
           <lastmod>${currentDate}</lastmod>
           <changefreq>weekly</changefreq>
           <priority>0.5</priority>
         </url>
 
         <url>
-          <loc>https://sanika-blogs.vercel.app/searchList</loc>
+          <loc>${FRONT_API}/searchList</loc>
           <lastmod>${currentDate}</lastmod>
           <changefreq>weekly</changefreq>
           <priority>0.5</priority>
         </url>
 
         <url>
-          <loc>https://sanika-blogs.vercel.app/blogs</loc>
+          <loc>${FRONT_API}/blogs</loc>
           <lastmod>${currentDate}</lastmod>
           <changefreq>daily</changefreq>
           <priority>0.9</priority>
@@ -54,7 +60,7 @@ export async function GET() {
           .map(
             (blog) => `
         <url>
-          <loc>https://sanika-blogs.vercel.app/blog/${blog.slug}</loc>
+          <loc>${FRONT_API}/blog/${blog.slug}</loc>
           <lastmod>${blog.updatedAt ? new Date(blog.updatedAt).toISOString() : currentDate}</lastmod>
           <changefreq>daily</changefreq>
           <priority>1.0</priority>

@@ -2,6 +2,8 @@ import Hero from "@/components/Hero";
 import RecentBlogs from "@/components/RecentBlogs";
 import PopularAuthors from "../components/PopularAuthors";
 
+const FRONT_API = process.env.NEXT_FRONTEND_API_URL
+
 export const metadata = {
   title: "Sanika Blogs - Read Latest Tech Blogs & Articles",
   description:
@@ -13,11 +15,11 @@ export const metadata = {
     title: "Sanika Blogs - Read Latest Tech Blogs & Articles",
     description:
       "Discover insightful blogs on web development, AI, digital marketing, and more.",
-    url: "https://sanika-blogs.vercel.app/",
+    url: FRONT_API,
     siteName: "Sanika Blogs",
     images: [
       {
-        // url: "https://sanika-blogs.vercel.app/og-home.png",
+        // url: FRONT_API,
         width: 1200,
         height: 630,
         alt: "Sanika Blogs Homepage",
@@ -29,10 +31,10 @@ export const metadata = {
     card: "summary_large_image",
     title: "Sanika Blogs - Read Latest Tech Blogs",
     description: "Discover insightful blogs on tech, AI, and more.",
-    // images: ["https://sanika-blogs.vercel.app/og-home.png"],
+    // images: [FRONT_API],
   },
   alternates: {
-    canonical: "https://sanika-blogs.vercel.app/",
+    canonical: FRONT_API,
   },
 };
 

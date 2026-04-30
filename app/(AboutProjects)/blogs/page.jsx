@@ -1,6 +1,8 @@
 // app/blog/page.js
 import Blogs from "./BlogsClient";
 
+const FRONT_API = process.env.NEXT_FRONTEND_API_URL
+
 // ✅ Ye metadata server par generate hoga — Facebook/Google dono ke liye kaam karega
 export const metadata = {
   title: "All Blogs - Sanika Blogs",
@@ -12,11 +14,11 @@ export const metadata = {
     title: "All Blogs - Sanika Blogs",
     description:
       "Browse all blog posts on web development, AI, digital marketing, UI/UX design, and more.",
-    url: "https://sanika-blogs.vercel.app/blogs",
+    url: FRONT_API + "/blogs",
     siteName: "Sanika Blogs",
     images: [
       {
-        url: "https://sanika-blogs.vercel.app/og-blogs.png",
+        url: FRONT_API + "/og-blogs.png",
         width: 1200,
         height: 630,
         alt: "Sanika Blogs - All Blogs",
@@ -29,10 +31,10 @@ export const metadata = {
     title: "All Blogs - Sanika Blogs",
     description:
       "Browse all blog posts on web development, AI, digital marketing, UI/UX design, and more.",
-    images: ["https://sanika-blogs.vercel.app/og-blogs.png"],
+    images: [FRONT_API + "/og-blogs.png"],
   },
   alternates: {
-    canonical: "https://sanika-blogs.vercel.app/blogs",
+    canonical: FRONT_API + "/blogs",
   },
 };
 

@@ -37,6 +37,8 @@ import CommentBox from "@/components/CommentBox";
 import { fetchUserLikedBlogs, toggleLikeBlog } from "@/redux/blogSlice";
 import { fetchCategories } from "@/redux/categorySlice";
 
+const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
+
 const SingleBlog = () => {
   const params = useParams();
   const router = useRouter();
@@ -128,10 +130,10 @@ const SingleBlog = () => {
     const pageDescription =
       getPlainTextFromHTML(selectedBlog.description)?.substring(0, 160) ||
       "Read this insightful blog post on Sanika Blogs.";
-    const pageUrl = `https://sanika-blogs.vercel.app/blog/${slug}`;
+    const pageUrl = `${FRONT_API}/blog/${slug}`;
     const ogImage =
       selectedBlog.thumbnail ||
-      "https://sanika-blogs.vercel.app/og-default.png";
+      `${FRONT_API}/og-default.png`;
 
     // Set title
     document.title = pageTitle;
