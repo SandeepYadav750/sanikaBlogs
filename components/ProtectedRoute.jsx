@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
 
       // Case 2: Route is for guests only (login/signup) but user IS logged in
       if (!requireAuth && user) {
-        router.push("/dashboard");
+        router.push("/dashboard/profile");
       }
     }
   }, [user, loading, router, requireAuth]);

@@ -50,15 +50,12 @@ const Login = () => {
 
   // ✅ FIXED useEffect
   useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
 
     if (isAuthenticated && user) {
       toast.success(message || "Login successfull!");
       router.push("/dashboard/profile");
     }
-  }, [error, isAuthenticated, user, message, router]);
+  }, [isAuthenticated, user, message, router]);
 
   return (
     <ProtectedRoute requireAuth={false}>

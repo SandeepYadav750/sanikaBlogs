@@ -33,9 +33,10 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const { loading, error, message } = useSelector((state) => state.auth);
-
-  console.log("REDUX STATE:", { message, error });
+  const { loading, message, error, isAuthenticated } = useSelector(
+    (state) => state.auth,
+  );
+  // console.log("REDUX STATE:", { message, error });
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser((prev) => ({
@@ -50,17 +51,18 @@ const SignUp = () => {
   };
 
   const userData = useSelector((state) => state.auth.user);
-  console.log("userData:", { userData });
-
+  console.log("userData", userData);
+  // ✅ FIXED useEffect
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
-    if (userData) {
-      toast.success(message || "Registration successfull");
-      router.push("/login");
+
+    if (isAuthenticated && userData) {
+      toast.success(message || "Registration successfull!");
+      router.push("/dashboard/profile");
     }
-  }, [userData, router, error, message]);
+  }, [error, userData, isAuthenticated, message, router]);
 
   return (
     <ProtectedRoute requireAuth={false}>
@@ -144,8 +146,8 @@ const SignUp = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create password"
-                      className="dark:text-white"
+                      placeholder="Create password (min. 6 characters)"
+                      className="dark:text-white pr-10"
                       name="password"
                       value={user.password}
                       onChange={handleChange}

@@ -14,6 +14,10 @@ export const registerUser = createAsyncThunk(
           "Content-Type": "application/json",
         },
       });
+      // Store token in localStorage as backup
+      if (res.data.token) {
+        localStorage.setItem("authToken", res.data.token);
+      }
       return res.data; // Return the full response data
     } catch (error) {
       return rejectWithValue(
@@ -34,9 +38,6 @@ export const loginUser = createAsyncThunk(
           "Content-Type": "application/json",
         },
       });
-
-      console.log("Login Response:", res.data);
-      console.log("Cookies set:", document.cookie);
 
       // Store token in localStorage as backup
       if (res.data.token) {
@@ -167,7 +168,8 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user.user;
+        state.user = action.payload;
+        state.token = action.payload.token; // 👈 success token
         state.isAuthenticated = true;
         state.message = action.payload.message; // 👈 success message
       })
@@ -188,15 +190,6 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.message = action.payload.message; // 👈 success message
       })
-      // .addCase(loginUser.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   const { token, user, message } = action.payload;
-
-      //   state.token = token || null;
-      //   state.user = user || null;
-      //   state.isAuthenticated = !!token; // Only true if token has truthy value
-      //   state.message = message;
-      // })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
