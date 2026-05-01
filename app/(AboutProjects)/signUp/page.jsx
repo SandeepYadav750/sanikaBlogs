@@ -33,10 +33,9 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const { loading, message, error, isAuthenticated } = useSelector(
+  const { loading, message, isAuthenticated } = useSelector(
     (state) => state.auth,
   );
-  // console.log("REDUX STATE:", { message, error });
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser((prev) => ({
@@ -54,15 +53,11 @@ const SignUp = () => {
   console.log("userData", userData);
   // ✅ FIXED useEffect
   useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-
     if (isAuthenticated && userData) {
       toast.success(message || "Registration successfull!");
       router.push("/dashboard/profile");
     }
-  }, [error, userData, isAuthenticated, message, router]);
+  }, [userData, isAuthenticated, message, router]);
 
   return (
     <ProtectedRoute requireAuth={false}>

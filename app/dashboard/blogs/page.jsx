@@ -31,6 +31,7 @@ import {
   deleteBlog,
   fetchPublishedBlogs,
 } from "@/redux/blogSlice";
+import Pagination from "@/components/Pagination"; // Import the pagination component
 
 const BlogList = () => {
   const dispatch = useDispatch();
@@ -42,6 +43,10 @@ const BlogList = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedBlogId, setSelectedBlogId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Filter blogs based on search - WITH NULL CHECK
   const filteredBlogs = blogs.filter((blog) => {
@@ -58,6 +63,17 @@ const BlogList = () => {
         )
       : [];
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedBlogs.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedBlogs.length / itemsPerPage);
+
+  // Reset to first page when search term or items per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, itemsPerPage]);
+
   // Create a Set of published blog slugs
   const publishedBlogSlugs = new Set(
     publishedBlogs?.map((blog) => blog.slug) || [],
@@ -67,17 +83,6 @@ const BlogList = () => {
   const isBlogPublished = (blogSlug) => {
     return publishedBlogSlugs.has(blogSlug);
   };
-
-  console.log("publishedBlogs slugs:", Array.from(publishedBlogSlugs));
-  console.log(
-    "All blogs:",
-    sortedBlogs.map((b) => ({
-      id: b._id,
-      slug: b.slug,
-      title: b.title,
-      isPublished: isBlogPublished(b.slug),
-    })),
-  );
 
   // Fetch blogs when component mounts
   useEffect(() => {
@@ -114,6 +119,10 @@ const BlogList = () => {
         await dispatch(fetchAllBlogs());
         await dispatch(fetchPublishedBlogs());
         toast.success(result.payload.message || "Blog deleted successfully");
+        // Reset to first page if current page becomes empty
+        if (currentItems.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
       } else {
         toast.error(result.payload.message || "Failed to delete blog");
       }
@@ -132,12 +141,24 @@ const BlogList = () => {
   };
 
   // Handle view blog - only for published blogs
-
   const handleViewBlog = (blogSlug) => {
     console.log("Attempting to view blog at URL:", blogSlug);
     if (isBlogPublished(blogSlug)) {
       router.push(`/blog/${blogSlug}`);
     }
+  };
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
   };
 
   // Loading state
@@ -345,54 +366,52 @@ const BlogList = () => {
         </div>
 
         {!sortedBlogs || sortedBlogs.length === 0 ? (
-          <>
-            <div className="flex justify-center items-center min-h-[60vh] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-              <div className="text-center max-w-md mx-auto px-6">
-                <div className="bg-linear-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-full p-6 w-32 h-32 mx-auto mb-8 flex items-center justify-center">
-                  <svg
-                    className="w-16 h-16 text-indigo-600 dark:text-indigo-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
-                  </svg>
-                </div>
-                <p className="text-gray-500 dark:text-gray-400">
-                  {searchTerm ? "No matching blogs found" : "No blogs yet"}
-                </p>
-                {!searchTerm && (
-                  <>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                      No blogs yet
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-8">
-                      Create your first blog post and start sharing your
-                      thoughts with the world.
-                    </p>
-                    <Button
-                      onClick={() => router.push("/dashboard/write-blog")}
-                      className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                    >
-                      Create Your First Blog
-                    </Button>
-                  </>
-                )}
+          <div className="flex justify-center items-center min-h-[60vh] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="text-center max-w-md mx-auto px-6">
+              <div className="bg-linear-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-full p-6 w-32 h-32 mx-auto mb-8 flex items-center justify-center">
+                <svg
+                  className="w-16 h-16 text-indigo-600 dark:text-indigo-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
+                </svg>
               </div>
+              <p className="text-gray-500 dark:text-gray-400">
+                {searchTerm ? "No matching blogs found" : "No blogs yet"}
+              </p>
+              {!searchTerm && (
+                <>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    No blogs yet
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-8">
+                    Create your first blog post and start sharing your thoughts
+                    with the world.
+                  </p>
+                  <Button
+                    onClick={() => router.push("/dashboard/write-blog")}
+                    className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    Create Your First Blog
+                  </Button>
+                </>
+              )}
             </div>
-          </>
+          </div>
         ) : (
           <>
             {/* Table Section */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               {/* Mobile View - Cards */}
               <div className="block lg:hidden">
-                {sortedBlogs.filter(Boolean).map((blog) => {
+                {currentItems.filter(Boolean).map((blog) => {
                   const isPublished = isBlogPublished(blog?.slug);
 
                   return (
@@ -535,7 +554,7 @@ const BlogList = () => {
                   </TableHeader>
 
                   <TableBody>
-                    {sortedBlogs.filter(Boolean).map((blog, index) => {
+                    {currentItems.filter(Boolean).map((blog, index) => {
                       const isPublished = isBlogPublished(blog?.slug);
 
                       return (
@@ -544,7 +563,7 @@ const BlogList = () => {
                           className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
                         >
                           <TableCell className="font-medium text-center text-gray-600 dark:text-gray-300">
-                            {index + 1}
+                            {indexOfFirstItem + index + 1}
                           </TableCell>
 
                           <TableCell>
@@ -663,12 +682,20 @@ const BlogList = () => {
                   </TableBody>
                 </Table>
               </div>
-              {/* No More Content Message */}
-              <div className="text-center py-6 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  🎉 You&apos;ve reached the end! All your blogs are loaded.
-                </p>
-              </div>
+
+              {/* Pagination Component */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                totalItems={sortedBlogs.length}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
+                showItemsPerPage={true}
+                itemsPerPageOptions={[5, 10, 25, 50]}
+                showTotalInfo={true}
+                variant="default"
+              />
             </div>
           </>
         )}

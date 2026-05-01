@@ -1,100 +1,129 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import Head from "next/head"; // ✅ Add this import
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublishedBlogs } from "@/redux/blogSlice";
-
-const FRONT_API = process.env.NEXT_FRONTEND_API_URL
+import { ImSpinner2 } from "react-icons/im";
+import { Button } from "@/components/ui/button";
+import Pagination from "@/components/Pagination";
 
 const Blogs = () => {
   const dispatch = useDispatch();
 
   // Get state from Redux
-  const { publishedBlogs } = useSelector((state) => state.blog);
+  const { publishedBlogs, loading } = useSelector((state) => state.blog);
+
+  // Responsive view mode - automatically switches based on screen size
+  const [viewMode, setViewMode] = useState("pagination"); // "pagination" or "infinite"
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Infinite scroll state
+  const [visibleItems, setVisibleItems] = useState(10);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loaderRef = useRef(null);
+  const itemsPerLoad = 10;
 
   // Fetch blogs when component mounts
   useEffect(() => {
     dispatch(fetchPublishedBlogs());
   }, [dispatch]);
 
-  // // ✅ SEO Meta Tags set karne ke liye useEffect
-  // useEffect(() => {
-  //   const pageTitle = "All Blogs - Sanika Blogs";
-  //   const pageDescription =
-  //     "Browse all blog posts on web development, AI, digital marketing, UI/UX design, and more.";
-  //   const pageUrl = FRONT_API + "/blogs";
-  //   const ogImage = FRONT_API + "/og-blogs.png";
+  // Check screen size and set view mode accordingly
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 768; // 768px is md breakpoint
+      setIsMobile(mobile);
+      setViewMode(mobile ? "infinite" : "pagination");
+    };
 
-  //   // Set document title
-  //   document.title = pageTitle;
+    // Check on mount
+    checkScreenSize();
 
-  //   // Helper function to set or create meta tags
-  //   const setMetaTag = (name, content, isProperty = false) => {
-  //     if (!content) return;
+    // Add event listener for window resize
+    window.addEventListener("resize", checkScreenSize);
 
-  //     const selector = isProperty ? `meta[property="${name}"]` : `meta[name="${name}"]`;
-  //     let meta = document.querySelector(selector);
+    // Cleanup
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
-  //     if (!meta) {
-  //       meta = document.createElement("meta");
-  //       if (isProperty) {
-  //         meta.setAttribute("property", name);
-  //       } else {
-  //         meta.setAttribute("name", name);
-  //       }
-  //       document.head.appendChild(meta);
-  //     }
-  //     meta.setAttribute("content", content);
-  //   };
+  // Reset states when blogs change or view mode changes
+  useEffect(() => {
+    setCurrentPage(1);
+    setVisibleItems(6);
+  }, [publishedBlogs?.length, viewMode]);
 
-  //   // Helper function to set link tags
-  //   const setLinkTag = (rel, href) => {
-  //     if (!href) return;
+  // Pagination calculations
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const paginatedBlogs =
+    publishedBlogs?.slice(indexOfFirstItem, indexOfLastItem) || [];
+  const totalPages = Math.ceil((publishedBlogs?.length || 0) / itemsPerPage);
 
-  //     let link = document.querySelector(`link[rel="${rel}"]`);
-  //     if (!link) {
-  //       link = document.createElement("link");
-  //       link.setAttribute("rel", rel);
-  //       document.head.appendChild(link);
-  //     }
-  //     link.setAttribute("href", href);
-  //   };
+  // Infinite scroll calculations
+  const infiniteBlogs = publishedBlogs?.slice(0, visibleItems) || [];
+  const hasMore = visibleItems < (publishedBlogs?.length || 0);
+  const remainingItems = (publishedBlogs?.length || 0) - visibleItems;
 
-  //   // Standard meta tags
-  //   setMetaTag("description", pageDescription);
-  //   setMetaTag("keywords", "all blogs, blog listing, tech articles, programming blogs, web development, AI, digital marketing", );
+  // Load more for infinite scroll
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
 
-  //   // Open Graph / Facebook
-  //   setMetaTag("og:title", pageTitle, true);
-  //   setMetaTag("og:description", pageDescription, true);
-  //   setMetaTag("og:url", pageUrl, true);
-  //   setMetaTag("og:site_name", "Sanika Blogs", true);
-  //   setMetaTag("og:image", ogImage, true);
-  //   setMetaTag("og:image:width", "1200", true);
-  //   setMetaTag("og:image:height", "630", true);
-  //   setMetaTag("og:type", "website", true);
+    setIsLoadingMore(true);
+    // Simulate loading delay for smooth animation
+    setTimeout(() => {
+      setVisibleItems((prev) =>
+        Math.min(prev + itemsPerLoad, publishedBlogs?.length || 0),
+      );
+      setIsLoadingMore(false);
+    }, 500);
+  }, [isLoadingMore, hasMore, publishedBlogs?.length, itemsPerLoad]);
 
-  //   // Twitter Card
-  //   setMetaTag("twitter:card", "summary_large_image");
-  //   setMetaTag("twitter:title", pageTitle);
-  //   setMetaTag("twitter:description", pageDescription);
-  //   setMetaTag("twitter:image", ogImage);
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (viewMode !== "infinite" || !hasMore || loading) return;
 
-  //   // Canonical URL
-  //   setLinkTag("canonical", pageUrl);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" },
+    );
 
-  //   // Console mein confirm karne ke liye
-  //   console.log("✅ SEO meta tags set for Blogs page");
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
 
-  //   // Cleanup function (optional - jab component unmount ho)
-  //   return () => {
-  //     console.log("Blogs page unmounted");
-  //   };
-  // }, []); // Empty dependency array - sirf ek baar run hoga
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [viewMode, hasMore, isLoadingMore, loading, loadMore]);
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Scroll to top of cards section
+    const cardsSection = document.getElementById("blogs-cards-section");
+    if (cardsSection) {
+      cardsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -140,11 +169,48 @@ const Blogs = () => {
     );
   };
 
+  // Skeleton Loader Component
+  const SkeletonCard = () => (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg animate-pulse">
+      <div className="h-56 bg-gray-200 dark:bg-gray-700"></div>
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2"></div>
+            </div>
+          </div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+        </div>
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3"></div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+        </div>
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Get current blogs based on view mode
+  const getCurrentBlogs = () => {
+    if (viewMode === "pagination") {
+      return paginatedBlogs;
+    } else {
+      return infiniteBlogs;
+    }
+  };
+
+  const currentBlogs = getCurrentBlogs();
+
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header with animation */}
-        <div className="text-center mb-12 animate-fade-in">
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="h-16 md:h-20 text-5xl md:text-6xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-400">
             Our Blogs
           </h1>
@@ -153,140 +219,105 @@ const Blogs = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {publishedBlogs && publishedBlogs.length > 0 ? (
-            publishedBlogs.map((blog, index) => (
-              <div
-                key={blog._id || blog.id}
-                className="group relative animate-slide-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                {/* Glow effect on hover */}
-                <div className="absolute -inset-0.5 bg-linear-to-r from-blue-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-20 blur transition duration-500"></div>
+        {/* Controls Section - Only show on desktop (pagination mode) */}
+        {!loading &&
+          publishedBlogs &&
+          publishedBlogs.length > 0 &&
+          // totalPages > 1 &&
+          viewMode === "pagination" && (
+            <div className="my-8 hidden md:block ">
+              <div className=" rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={publishedBlogs.length}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  showItemsPerPage={true}
+                  showTotalInfo={true}
+                  itemsPerPageOptions={[10, 20, 30, 45, 60]}
+                  variant="default"
+                />
+              </div>
+            </div>
+          )}
 
-                {/* Card */}
-                <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                  {/* Blog Image with overlay */}
-                  {blog.thumbnail && blog.thumbnail !== "" && (
-                    <div className="relative h-56 overflow-hidden">
-                      <Link
-                        href={`/blog/${blog.slug}`}
-                        className="cursor-pointer block w-full h-full"
-                      >
-                        <Image
-                          src={blog?.thumbnail}
-                          alt={blog?.title || "Blog thumbnail"}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                          width={80}
-                          height={48}
-                          unoptimized={true}
-                        />
+        {/* Blog Cards Section */}
+        <div id="blogs-cards-section">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? (
+              // Initial loading skeletons
+              Array.from({ length: itemsPerPage }).map((_, index) => (
+                <SkeletonCard key={`skeleton-${index}`} />
+              ))
+            ) : currentBlogs.length > 0 ? (
+              // Actual blog cards
+              currentBlogs.map((blog, index) => (
+                <div
+                  key={blog._id || blog.id}
+                  className="group relative animate-slide-up"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  {/* Glow effect on hover */}
+                  <div className="absolute -inset-0.5 bg-linear-to-r from-blue-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-20 blur transition duration-500"></div>
 
-                        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                        {/* Category badge on image */}
-                        <div className="absolute top-4 left-4 z-10">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
-                          >
-                            {blog.category || "Digital Marketing"}
-                          </span>
-                        </div>
-                      </Link>
-                    </div>
-                  )}
-
-                  <div className="p-6">
-                    {/* Author and Date */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        {/* Author Avatar */}
-                        <Avatar className="h-14 w-14 ring-4 ring-indigo-100 dark:ring-indigo-900/50">
-                          <AvatarImage src={blog.author?.photoURL} />
-                          <AvatarFallback className="bg-linear-to-r from-indigo-500 to-purple-500 text-white text-lg">
-                            {getInitials(
-                              (blog.author?.firstName || "") +
-                                (blog.author?.lastName || "") || "A",
-                            )}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
-                            {`${blog.author?.firstName || ""} ${blog.author?.lastName || ""}`.trim() ||
-                              "Anonymous Author"}
-                          </h3>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-500">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                  {/* Card */}
+                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+                    {/* Blog Image with overlay */}
+                    {(blog.thumbnail || blog.coverImage) && (
+                      <div className="relative h-56 overflow-hidden">
+                        <Link
+                          href={`/blog/${blog.slug}`}
+                          className="cursor-pointer block w-full h-full"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          <Image
+                            src={blog?.thumbnail || blog?.coverImage}
+                            alt={blog?.title || "Blog thumbnail"}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                            width={400}
+                            height={300}
+                            unoptimized={true}
                           />
-                        </svg>
-                        <span>
-                          {formatDate(blog.createdAt) ||
-                            formatDate(blog.publishedAt) ||
-                            "21 May 2025"}
-                        </span>
+
+                          <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                          {/* Category badge on image */}
+                          <div className="absolute top-4 left-4 z-10">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
+                            >
+                              {blog.category || "Digital Marketing"}
+                            </span>
+                          </div>
+                        </Link>
                       </div>
-                    </div>
+                    )}
 
-                    {/* Blog Title with hover effect */}
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                      <Link
-                        href={`/blog/${blog.slug}`}
-                        className="hover:underline"
-                      >
-                        {blog.title}
-                      </Link>
-                    </h2>
-
-                    {/* Subtitle/Excerpt */}
-                    <p
-                      className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2"
-                      dangerouslySetInnerHTML={{
-                        __html: blog.description?.substring(0, 120) + "...",
-                      }}
-                    />
-
-                    {/* Read More Link with arrow animation */}
-                    <Link
-                      href={`/blog/${blog.slug}`}
-                      className="inline-flex items-center text-blue-600 dark:text-blue-400 font-semibold group/link hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-300"
-                    >
-                      <span className="relative">
-                        Read More
-                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 group-hover/link:w-full transition-all duration-300"></span>
-                      </span>
-                      <svg
-                        className="w-5 h-5 ml-2 transform group-hover/link:translate-x-1 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </Link>
-
-                    {/* Reading time indicator (optional) */}
-                    {blog.readingTime && (
-                      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-500">
+                    <div className="p-6">
+                      {/* Author and Date */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          {/* Author Avatar */}
+                          <Avatar className="h-14 w-14 ring-4 ring-indigo-100 dark:ring-indigo-900/50">
+                            <AvatarImage src={blog.author?.photoURL} />
+                            <AvatarFallback className="bg-linear-to-r from-indigo-500 to-purple-500 text-white text-lg">
+                              {getInitials(
+                                (blog.author?.firstName || "") +
+                                  (blog.author?.lastName || "") || "A",
+                              )}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
+                              {`${blog.author?.firstName || ""} ${blog.author?.lastName || ""}`.trim() ||
+                                "Anonymous Author"}
+                            </h3>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-500">
                           <svg
-                            className="w-3 h-3"
+                            className="w-4 h-4"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -295,43 +326,159 @@ const Blogs = () => {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                             />
                           </svg>
-                          <span>{blog.readingTime} min read</span>
+                          <span>
+                            {formatDate(blog.createdAt) ||
+                              formatDate(blog.publishedAt) ||
+                              "21 May 2025"}
+                          </span>
                         </div>
                       </div>
-                    )}
+
+                      {/* Blog Title with hover effect */}
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                        <Link
+                          href={`/blog/${blog.slug}`}
+                          className="hover:underline"
+                        >
+                          {blog.title}
+                        </Link>
+                      </h2>
+
+                      {/* Subtitle/Excerpt */}
+                      <p
+                        className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            (blog.description || blog.content)?.substring(
+                              0,
+                              120,
+                            ) + "...",
+                        }}
+                      />
+
+                      {/* Read More Link with arrow animation */}
+                      <Link
+                        href={`/blog/${blog.slug}`}
+                        className="inline-flex items-center text-blue-600 dark:text-blue-400 font-semibold group/link hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-300"
+                      >
+                        <span className="relative">
+                          Read More
+                          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 group-hover/link:w-full transition-all duration-300"></span>
+                        </span>
+                        <svg
+                          className="w-5 h-5 ml-2 transform group-hover/link:translate-x-1 transition-transform duration-300"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </Link>
+
+                      {/* Reading time indicator (optional) */}
+                      {blog.readingTime && (
+                        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-500">
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            <span>{blog.readingTime} min read</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              // Empty state
+              <div className="col-span-full text-center py-16 animate-fade-in">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-800 mb-6">
+                  <svg
+                    className="w-12 h-12 text-gray-400 dark:text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  No blogs yet
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Stay tuned! Exciting content is coming soon.
+                </p>
               </div>
-            ))
-          ) : (
-            // Enhanced empty state with animation
-            <div className="col-span-full text-center py-16 animate-fade-in">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-800 mb-6">
-                <svg
-                  className="w-12 h-12 text-gray-400 dark:text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                  />
-                </svg>
+            )}
+          </div>
+
+          {/* Infinite Scroll Loading Indicator - Mobile Only */}
+          {viewMode === "infinite" && !loading && hasMore && (
+            <div ref={loaderRef} className="text-center py-8">
+              <div className="inline-flex items-center gap-3 text-gray-500 dark:text-gray-400">
+                {isLoadingMore ? (
+                  <>
+                    <ImSpinner2 className="animate-spin text-2xl" />
+                    <span>Loading more blogs...</span>
+                  </>
+                ) : (
+                  <div className="h-10" /> // Invisible spacer when not loading
+                )}
               </div>
-              <h3 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                No blogs yet
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400">
-                Stay tuned! Exciting content is coming soon.
-              </p>
             </div>
           )}
+
+          {/* End of content message for infinite scroll - Mobile Only */}
+          {viewMode === "infinite" &&
+            !loading &&
+            !hasMore &&
+            currentBlogs.length > 0 && (
+              <div className="text-center mt-8 py-8">
+                <div className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>
+                    You've reached the end! That's all {currentBlogs.length}{" "}
+                    blogs.
+                  </span>
+                </div>
+              </div>
+            )}
         </div>
       </div>
 
