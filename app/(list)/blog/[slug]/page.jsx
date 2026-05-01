@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import BlogClient from "./slugBlogClient";
 
+const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
+console.log("FRONT_API", FRONT_API);
+
 // This function fetches the blog on the server
 async function getBlogBySlug(slug) {
   try {
@@ -62,13 +65,11 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: blog.title,
       description: plainText,
-      url: `${process.env.NEXT_FRONTEND_API_URL}/blog/${slug}`,
+      url: `${FRONT_API}/blog/${slug}`,
       siteName: "Sanika Blogs",
       images: [
         {
-          url:
-            blog.thumbnail ||
-            `${process.env.NEXT_FRONTEND_API_URL}/og-default.png`,
+          url: blog.thumbnail || `${FRONT_API}/og-default.png`,
           width: 1200,
           height: 630,
           alt: blog.title,
@@ -84,13 +85,11 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title: blog.title,
       description: plainText,
-      images: [
-        blog.thumbnail || `${process.env.NEXT_FRONTEND_API_URL}/og-default.png`,
-      ],
+      images: [blog.thumbnail || `${FRONT_API}/og-default.png`],
       creator: authorName,
     },
     alternates: {
-      canonical: `${process.env.NEXT_FRONTEND_API_URL}/blog/${slug}`,
+      canonical: `${FRONT_API}/blog/${slug}`,
     },
   };
 }
