@@ -6,8 +6,7 @@ export const dynamic = "force-dynamic"; // Force dynamic rendering
 export const revalidate = 0; // Disable caching completely
 
 const API = process.env.NEXT_PUBLIC_API_URL;
-const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
-
+const FRONT_API = "https://sanika-blogs.vercel.app";
 
 export async function GET() {
   try {
