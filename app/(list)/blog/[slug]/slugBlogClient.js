@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
@@ -37,28 +37,21 @@ import CommentBox from "@/components/CommentBox";
 import { fetchUserLikedBlogs, toggleLikeBlog } from "@/redux/blogSlice";
 import { fetchAllUsersCategories } from "@/redux/categorySlice";
 
-// const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
-
-const SingleBlog = () => {
-  const params = useParams();
+const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
   const router = useRouter();
   const dispatch = useDispatch();
-  const slug = params?.slug;
-
-  // Safely access Redux state with fallbacks
-  const { likedBlogs = [], loading = false } = useSelector(
-    (store) => store.blog || {},
-  );
-  const publishedBlogs = useSelector((state) => state.blog.publishedBlogs);
-  const { user } = useSelector((state) => state.auth.user || {});
-  const { allUsersCategories } = useSelector((state) => state.category);
-
-  const [selectedBlog, setSelectedBlog] = useState(null);
+  
+  // Start with the server-provided blog data
+  const [selectedBlog, setSelectedBlog] = useState(initialBlog);
   const [saved, setSaved] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [blogLikeCount, setBlogLikeCount] = useState(0);
-  const [initialFetchDone, setInitialFetchDone] = useState(false);
+  const [blogLikeCount, setBlogLikeCount] = useState(initialBlog?.likes?.length || 0);
+  const [initialFetchDone, setInitialFetchDone] = useState(!!initialBlog); // Set to true if we have initialBlog
+
+  const { likedBlogs = [], loading = false } = useSelector((store) => store.blog || {});
+  const { user } = useSelector((state) => state.auth?.user || {});
+  const { allUsersCategories } = useSelector((state) => state.category);
 
   const userIDs = selectedBlog?.author?._id || [];
 
@@ -73,35 +66,25 @@ const SingleBlog = () => {
     dispatch(fetchAllUsersCategories());
   }, [dispatch]);
 
-  // Fetch blogs and user's liked blogs on mount
+  // Fetch user's liked blogs on mount
   useEffect(() => {
-    if (!initialFetchDone) {
+    if (user && !initialFetchDone) {
       const fetchData = async () => {
         try {
-          if (user) {
-            await dispatch(fetchUserLikedBlogs()).unwrap();
-          }
+          await dispatch(fetchUserLikedBlogs()).unwrap();
         } catch (error) {
           console.error("Error fetching initial data:", error);
         } finally {
           setInitialFetchDone(true);
         }
       };
-
       fetchData();
     }
   }, [dispatch, user, initialFetchDone]);
 
-  // Find blog and fetch liked status
-  useEffect(() => {
-    if (publishedBlogs && publishedBlogs.length > 0 && slug) {
-      const foundBlog = publishedBlogs.find(
-        (b) => String(b?.slug) === String(slug),
-      );
-      console.log("Found blog by slug:", foundBlog);
-      setSelectedBlog(foundBlog || null);
-    }
-  }, [publishedBlogs, slug]);
+  // REMOVE THIS useEffect - It's causing the problem!
+  // DO NOT overwrite selectedBlog from Redux
+  // The blog data is already provided via initialBlog prop
 
   // Update liked state based on likedBlogs from Redux
   useEffect(() => {
@@ -109,89 +92,12 @@ const SingleBlog = () => {
       const hasLiked = likedBlogs.some(
         (blog) => String(blog?._id || blog) === String(selectedBlog._id),
       );
-
       setLiked(hasLiked);
       setBlogLikeCount(selectedBlog.likes?.length || 0);
     }
   }, [selectedBlog, user, likedBlogs]);
 
-  // HTML se text nikalne ka function
-  const getPlainTextFromHTML = (htmlString) => {
-    if (!htmlString) return "";
-
-    // Browser environment me kaam karega
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = htmlString;
-    return tempDiv.textContent || tempDiv.innerText || "";
-  };
-
-  //   useEffect(() => {
-  //     if (!selectedBlog) return;
-
-  //     const authorName =
-  //       selectedBlog.author?.firstName && selectedBlog.author?.lastName
-  //         ? `${selectedBlog.author.firstName} ${selectedBlog.author.lastName}`
-  //         : "Sanika Blogs";
-  //     const pageTitle = `${selectedBlog.title} | Sanika Blogs`;
-  //     const pageDescription =
-  //       getPlainTextFromHTML(selectedBlog.description)?.substring(0, 160) ||
-  //       "Read this insightful blog post on Sanika Blogs.";
-  //     const pageUrl = `${FRONT_API}/blog/${slug}`;
-  //     const ogImage = selectedBlog.thumbnail || `${FRONT_API}/og-default.png`;
-
-  //     // Set title
-  //     document.title = pageTitle;
-
-  //     // Update or create meta tags
-  //     const setMetaTag = (name, content, isProperty = false) => {
-  //       let selector = isProperty
-  //         ? `meta[property="${name}"]`
-  //         : `meta[name="${name}"]`;
-  //       let meta = document.querySelector(selector);
-  //       if (!meta) {
-  //         meta = document.createElement("meta");
-  //         if (isProperty) {
-  //           meta.setAttribute("property", name);
-  //         } else {
-  //           meta.setAttribute("name", name);
-  //         }
-  //         document.head.appendChild(meta);
-  //       }
-  //       meta.setAttribute("content", content);
-  //     };
-
-  //     setMetaTag("description", pageDescription);
-  //     setMetaTag(
-  //       "keywords",
-  //       `${selectedBlog.keywords}, ${selectedBlog.category || "blog"}, blogging, articles, sanika blogs, ${selectedBlog.title}`,
-  //     );
-  //     setMetaTag("author", authorName);
-
-  //     // Open Graph
-  //     setMetaTag("og:title", selectedBlog.title, true);
-  //     setMetaTag("og:description", pageDescription, true);
-  //     setMetaTag("og:url", pageUrl, true);
-  //     setMetaTag("og:image", ogImage, true);
-  //     setMetaTag("og:type", "article", true);
-
-  //     // Twitter
-  //     setMetaTag("twitter:card", "summary_large_image");
-  //     setMetaTag("twitter:title", selectedBlog.title);
-  //     setMetaTag("twitter:description", pageDescription);
-  //     setMetaTag("twitter:image", ogImage);
-
-  //     // Canonical
-  //     let canonical = document.querySelector('link[rel="canonical"]');
-  //     if (!canonical) {
-  //       canonical = document.createElement("link");
-  //       canonical.setAttribute("rel", "canonical");
-  //       document.head.appendChild(canonical);
-  //     }
-  //     canonical.setAttribute("href", pageUrl);
-  //   }, [selectedBlog, slug]);
-
   // Calculate reading time
-
   const getReadingTime = (content) => {
     if (!content) return "8 min read";
     const wordsPerMinute = 200;
@@ -293,7 +199,7 @@ const SingleBlog = () => {
     setShowShareMenu(false);
   };
 
-  // Show loading state
+  // Show loading state - ONLY if no blog and still loading
   if ((loading || !initialFetchDone) && !selectedBlog) {
     return (
       <div className="min-h-screen bg-gray-200 dark:bg-gray-900 flex items-center justify-center">
@@ -308,7 +214,7 @@ const SingleBlog = () => {
   }
 
   // Show not found state
-  if (!loading && initialFetchDone && !selectedBlog) {
+  if (!selectedBlog) {
     return (
       <div className="min-h-screen bg-gray-200 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
@@ -346,10 +252,7 @@ const SingleBlog = () => {
     );
   }
 
-  if (!selectedBlog) {
-    return null;
-  }
-
+  // Rest of your JSX remains exactly the same...
   return (
     <>
       <div className="bg-gray-200 min-h-screen dark:bg-gray-900 pb-2">
@@ -373,8 +276,7 @@ const SingleBlog = () => {
             </Breadcrumb>
           </div>
 
-          {/* Rest of your existing JSX remains EXACTLY THE SAME */}
-          {/* Main Content */}
+          {/* Main Content - Your existing JSX continues here */}
           <div className="pt-4">
             {/* Blog Header */}
             <div className="mb-8">
@@ -413,7 +315,7 @@ const SingleBlog = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Action Buttons - Your existing code */}
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"

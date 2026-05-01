@@ -105,6 +105,8 @@ export default async function BlogPage({ params }) {
     notFound();
   }
 
-  // Pass the blog data to client component for interactivity
-  return <BlogClient initialBlog={blog} />;
+  // Make sure to stringify and parse to avoid serialization issues
+  const serializedBlog = JSON.parse(JSON.stringify(blog));
+  
+  return <BlogClient initialBlog={serializedBlog} />;
 }
