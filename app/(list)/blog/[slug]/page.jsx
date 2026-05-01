@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
 import BlogClient from "./slugBlogClient";
 
-const FRONT_API = process.env.NEXT_FRONTEND_API_URL;
-console.log("FRONT_API", FRONT_API);
-
 // This function fetches the blog on the server
 async function getBlogBySlug(slug) {
   try {
@@ -39,6 +36,9 @@ async function getBlogBySlug(slug) {
 // ✅ FIXED: Make the function async and await params
 export async function generateMetadata({ params }) {
   // ✅ Await params before accessing its properties
+
+  const FRONT_API = "https://sanika-blogs.vercel.app/";
+
   const { slug } = await params;
   const blog = await getBlogBySlug(slug);
 
