@@ -2,7 +2,7 @@ import Hero from "@/components/Hero";
 import RecentBlogs from "@/components/RecentBlogs";
 import PopularAuthors from "../components/PopularAuthors";
 
-const FRONT_API = "https://sanika-blogs.vercel.app";
+const FRONT_API = "https://www.sanikablogs.com";
 
 export const metadata = {
   title: "Sanika Blogs - Read Latest Tech Blogs & Articles",

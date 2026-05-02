@@ -1,5 +1,10 @@
 import Image from "next/image";
 
+export const metadata = {
+  title: "About Us | Sanika Blogs",
+  description: "Learn more about Sanika Blogs platform.",
+};
+
 const AboutSection = () => {
   return (
     <section className=" py-16 px-6">

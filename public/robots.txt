@@ -6,4 +6,4 @@ Disallow: /login/
 Disallow: /signUp/
 Disallow: /*?*
 
-Sitemap: https://sanika-blogs.vercel.app/sitemap.xml
+Sitemap: https://www.sanikablogs.com/sitemap.xml

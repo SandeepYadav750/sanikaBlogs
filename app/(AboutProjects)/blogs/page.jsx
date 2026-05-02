@@ -1,7 +1,7 @@
 // app/blog/page.js
 import Blogs from "./BlogsClient";
 
-const FRONT_API = "https://sanika-blogs.vercel.app";
+const FRONT_API = "https://www.sanikablogs.com";
 
 // ✅ Ye metadata server par generate hoga — Facebook/Google dono ke liye kaam karega
 export const metadata = {

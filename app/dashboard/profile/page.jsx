@@ -4,7 +4,7 @@ import { getServerUser } from "@/lib/getServerUser";
 import Script from "next/script";
 import ProfileClient from "./ProfileClient"; // Your existing client component
 
-const FRONT_API = "https://sanika-blogs.vercel.app";
+const FRONT_API = "https://www.sanikablogs.com";
 
 // ✅ STEP 1 + STEP 4: Dynamic Metadata + Open Graph + Twitter Cards
 export async function generateMetadata() {
@@ -30,7 +30,8 @@ export async function generateMetadata() {
     };
   }
 
-  const displayName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User";
+  const displayName =
+    `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User";
   const profileUrl = `${FRONT_API}/dashboard/profile`;
 
   return {

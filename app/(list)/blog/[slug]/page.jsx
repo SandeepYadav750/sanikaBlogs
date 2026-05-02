@@ -37,7 +37,7 @@ async function getBlogBySlug(slug) {
 export async function generateMetadata({ params }) {
   // ✅ Await params before accessing its properties
 
-  const FRONT_API = "https://sanika-blogs.vercel.app";
+  const FRONT_API = "https://www.sanikablogs.com";
 
   const { slug } = await params;
   const blog = await getBlogBySlug(slug);
