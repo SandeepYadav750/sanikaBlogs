@@ -7,7 +7,6 @@ import ThemeProvider from "../components/ThemeProviders";
 import Footer from "../components/Footer";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -22,7 +21,7 @@ export const metadata = {
   title: "Sanika Blogs",
   description: "A blogging platform built with Next.js and Tailwind CSS",
   verification: {
-    google: "RP0vRtcsn9giH12SZaTZo1jvVvsewweZooDTkr1ZZMA",
+    google: "iCbdWLZOx17wqMBVHFz1QOZwsg2ASjSZuygl2gw66J0",
   },
 };
 
