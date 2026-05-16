@@ -69,7 +69,7 @@ export async function generateMetadata({ params }) {
       siteName: "Sanika Blogs",
       images: [
         {
-          url: blog.thumbnail || `${FRONT_API}/og-default.png`,
+          url: blog.thumbnail || `${FRONT_API}/sanikaBlogThumbnail.png`,
           width: 1200,
           height: 630,
           alt: blog.title,
@@ -85,7 +85,7 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title: blog.title,
       description: plainText,
-      images: [blog.thumbnail || `${FRONT_API}/og-default.png`],
+      images: [blog.thumbnail || `${FRONT_API}/sanikaBlogThumbnail.png`],
       creator: authorName,
     },
     alternates: {

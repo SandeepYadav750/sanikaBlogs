@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   FaFacebookF,
@@ -17,9 +18,7 @@ const Footer = () => {
         {/* Logo + Info */}
         <div>
           <div className="flex items-center gap-2 mb-5">
-            <div className="bg-red-500 p-2 rounded-lg shadow-md">
-              <span className="text-white font-bold text-xl">✒</span>
-            </div>
+            <Image src="/favicon.png" width={50} height={50} alt="favicon" />
             <h2 className="text-2xl font-bold text-white tracking-tight">
               Blog<span className="text-red-500">.</span>
             </h2>

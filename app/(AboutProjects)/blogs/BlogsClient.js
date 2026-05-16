@@ -265,34 +265,32 @@ const Blogs = () => {
                   {/* Card */}
                   <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
                     {/* Blog Image with overlay */}
-                    {(blog.thumbnail || blog.coverImage) && (
-                      <div className="relative h-56 overflow-hidden">
-                        <Link
-                          href={`/blog/${blog.slug}`}
-                          className="cursor-pointer block w-full h-full"
-                        >
-                          <Image
-                            src={blog?.thumbnail || blog?.coverImage}
-                            alt={blog?.title || "Blog thumbnail"}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                            width={400}
-                            height={300}
-                            unoptimized={true}
-                          />
+                    <div className="relative h-56 overflow-hidden">
+                      <Link
+                        href={`/blog/${blog.slug}`}
+                        className="cursor-pointer block w-full h-full"
+                      >
+                        <Image
+                          src={blog?.thumbnail || "/sanikaBlogThumbnail.png"}
+                          alt={blog?.title || "Blog thumbnail"}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          width={400}
+                          height={300}
+                          unoptimized={true}
+                        />
 
-                          <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                          {/* Category badge on image */}
-                          <div className="absolute top-4 left-4 z-10">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
-                            >
-                              {blog.category || "Digital Marketing"}
-                            </span>
-                          </div>
-                        </Link>
-                      </div>
-                    )}
+                        {/* Category badge on image */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(blog.category)}`}
+                          >
+                            {blog.category || "Digital Marketing"}
+                          </span>
+                        </div>
+                      </Link>
+                    </div>
 
                     <div className="p-6">
                       {/* Author and Date */}

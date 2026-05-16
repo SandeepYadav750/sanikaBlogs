@@ -41,13 +41,6 @@ export async function GET() {
         </url>
 
         <url>
-          <loc>${FRONT_API}/searchList</loc>
-          <lastmod>${currentDate}</lastmod>
-          <changefreq>weekly</changefreq>
-          <priority>0.5</priority>
-        </url>
-
-        <url>
           <loc>${FRONT_API}/blogs</loc>
           <lastmod>${currentDate}</lastmod>
           <changefreq>daily</changefreq>

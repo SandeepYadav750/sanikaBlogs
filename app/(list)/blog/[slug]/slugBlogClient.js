@@ -266,7 +266,7 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard/blogs">Blogs</BreadcrumbLink>
+                  <BreadcrumbLink href="/blogs">Blogs</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -394,10 +394,9 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
             </div>
 
             {/* Feature Image */}
-            {selectedBlog.thumbnail ? (
               <div className="w-full md:h-100 mb-8 rounded-xl overflow-hidden shadow-lg">
                 <Image
-                  src={selectedBlog.thumbnail}
+                  src={selectedBlog.thumbnail || "/sanikaBlogThumbnail.png"}
                   alt={selectedBlog.title}
                   width={800}
                   height={400}
@@ -405,11 +404,6 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
                   priority
                 />
               </div>
-            ) : (
-              <div className="mb-8 rounded-xl overflow-hidden shadow-lg bg-linear-to-r from-indigo-500 to-purple-500 h-64 flex items-center justify-center">
-                <p className="text-white text-lg">Featured Image</p>
-              </div>
-            )}
 
             {/* Blog Content */}
             <article className="prose prose-lg dark:prose-invert max-w-none">

@@ -423,7 +423,7 @@ const BlogList = () => {
                         <div className="shrink-0">
                           {blog?.thumbnail || blog?.coverImage ? (
                             <Image
-                              src={blog?.thumbnail || blog?.coverImage}
+                              src={blog?.thumbnail || blog?.coverImage || "/sanikaBlogThumbnail.png"}
                               alt={blog?.title || "Blog thumbnail"}
                               className="h-16 w-16 rounded-lg object-cover"
                               width={64}

@@ -32,6 +32,7 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
+import Image from "next/image";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -119,7 +120,7 @@ const Navbar = () => {
             href="/"
             className="text-2xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent hover:from-indigo-500 hover:to-purple-500 transition-all duration-300"
           >
-            Logo
+            <Image src="/sanikaLogo.png" width={100} height={40} alt="logo" />
           </Link>
 
           {/* Desktop Search Bar */}

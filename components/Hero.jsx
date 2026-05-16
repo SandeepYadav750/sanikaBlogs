@@ -4,25 +4,25 @@ import { Button } from "./ui/button";
 
 const Hero = () => {
   return (
-    <section className="pb-12 md:pb-20 px-4 md:px-0 flex items-center">
+    <section className="p-4 md:p-8 flex items-center">
       <div className="max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Text Content */}
-          <div className="space-y-6">
-            <div className="space-y-3">
+          <div className="space-y-4 md:space-y-6">
+            <div className="space-y-1 md:space-y-3">
               <h1 className="text-4xl md:text-6xl font-bold dark:text-white text-gray-900 leading-tight">
                 Welcome to <span className="text-blue-600">Sanika Blogs</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300">
-                Discover insightful articles, stories, and perspectives on
-                technology, lifestyle, and personal growth.
+                Discover stories, insightful articles and perspectives on
+                personal growth, technology and lifestyle.
               </p>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="flex  gap-2 md:gap-4 pt-4">
               <Link href="/blogs">
-                <Button className=" px-8 py-6 text-lg rounded-lg">
+                <Button className="px-8 py-6 text-lg rounded-lg">
                   Explore Blogs
                 </Button>
               </Link>
@@ -37,7 +37,7 @@ const Hero = () => {
             </div>
 
             {/* Stats */}
-            <div className="flex gap-8 pt-8 border-t dark:border-gray-700">
+            <div className="flex gap-8 pt-2 md:pt-8 border-t dark:border-gray-700">
               <div>
                 <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                   50+
@@ -60,12 +60,12 @@ const Hero = () => {
           </div>
 
           {/* Image Content */}
-          <div className="relative h-96 md:h-full min-h-96">
+          <div className="relative h-68 md:h-full rounded-lg ">
             <Image
-              src="/blog2.png"
+              src="/homebanners.png"
               alt="Hero Image"
               fill
-              className="object-cover rounded-lg "
+              className=" rounded-lg "
               priority
             />
           </div>
