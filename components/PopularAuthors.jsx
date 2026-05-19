@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "@/redux/authSlice";
 import Image from "next/image";
 import { fetchPublishedBlogs } from "../redux/blogSlice";
+import Link from "next/link";
+import { FaFacebook, FaLinkedin } from "react-icons/fa";
+import { FaSquareXTwitter, FaSquareInstagram } from "react-icons/fa6";
 
 const PopularAuthors = () => {
   const dispatch = useDispatch();
@@ -126,6 +129,20 @@ const PopularAuthors = () => {
                 <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full">
                   {author.postCount} {author.postCount === 1 ? "post" : "posts"}
                 </span>
+              </div>
+              <div className="flex items-center justify-center gap-3 text-xl w-full mt-2">
+                <Link href={author.facebook} target="_blank">
+                  <FaFacebook />
+                </Link>
+                <Link href={author.twitter} target="_blank">
+                  <FaSquareXTwitter />
+                </Link>
+                <Link href={author.linkedin} target="_blank">
+                  <FaLinkedin />
+                </Link>
+                <Link href={author.instagram} target="_blank">
+                  <FaSquareInstagram />
+                </Link>
               </div>
             </div>
           ))}

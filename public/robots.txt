@@ -1,9 +1,13 @@
-# frontend/public/robots.txt
+
+
 User-agent: *
 Allow: /
+Allow: /_next/image/
+Allow: /_next/static/
+
 Disallow: /dashboard/
 Disallow: /login/
 Disallow: /signUp/
-Disallow: /*?*
+Disallow: /_next/data/
 
 Sitemap: https://www.sanikablogs.com/sitemap.xml

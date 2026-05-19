@@ -256,7 +256,7 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
   return (
     <>
       <div className="bg-gray-200 min-h-screen dark:bg-gray-900 pb-2">
-        <div className="bg-white dark:bg-gray-900 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 rounded-lg">
+        <div className="bg-white dark:bg-gray-800 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 rounded-lg">
           {/* Breadcrumb */}
           <div className="pb-4 border-b border-gray-200">
             <Breadcrumb>

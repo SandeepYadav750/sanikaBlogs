@@ -174,3 +174,12 @@
     cursor: pointer !important;
   }
 }
+
+.textHighlight {
+  background-color: black;
+  border-left: 4px solid blue;
+  color: #fff;
+  padding: 4px;
+  border-radius: 5px;
+  text-align: center;
+}
