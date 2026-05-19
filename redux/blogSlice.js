@@ -157,7 +157,6 @@ export const togglePublishBlog = createAsyncThunk(
         {},
         { withCredentials: true },
       );
-      console.log("res.data", res.data);
       return { blogId, data: res.data };
     } catch (error) {
       return rejectWithValue(

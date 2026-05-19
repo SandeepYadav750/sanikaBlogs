@@ -42,7 +42,6 @@ const Comments = () => {
       //     withCredentials: true,
       //   },
       // );
-      console.log("fetch all comment response:", result.payload);
       if (getAllComment.fulfilled.match(result)) {
         setAllComments(result.payload);
       } else {

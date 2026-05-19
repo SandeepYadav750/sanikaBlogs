@@ -50,7 +50,6 @@ const SignUp = () => {
   };
 
   const userData = useSelector((state) => state.auth.user);
-  console.log("userData", userData);
   // ✅ FIXED useEffect
   useEffect(() => {
     if (isAuthenticated && userData) {

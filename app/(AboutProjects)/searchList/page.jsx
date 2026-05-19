@@ -14,7 +14,6 @@ const SearchList = () => {
   const query = searchParams.get("q");
   // const { blogs } = useSelector((store) => store.blog);
   const publishedBlogs = useSelector((state) => state.blog.publishedBlogs);
-  console.log("Published Blogs in SearchList:", publishedBlogs);
 
   // Fetch blogs when component mounts
   useEffect(() => {

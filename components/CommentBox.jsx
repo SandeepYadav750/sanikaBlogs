@@ -37,7 +37,6 @@ const CommentBox = ({ blogId }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { user } = useSelector((state) => state.auth.user) || {};
-  console.log("user in comment box", user);
   const { comments, loading } = useSelector((state) => state.comment);
 
   const [comment, setComment] = useState("");
@@ -155,7 +154,6 @@ const CommentBox = ({ blogId }) => {
           content: comment,
         }),
       ).unwrap();
-      console.log("result", result);
 
       if (result.success) {
         setComment("");
@@ -189,7 +187,6 @@ const CommentBox = ({ blogId }) => {
 
     try {
       const result = await dispatch(deleteComment(id)).unwrap();
-      console.log("result", result);
 
       if (result.success) {
         toast.success(result.message || "Comment deleted successfully!");
@@ -245,7 +242,6 @@ const CommentBox = ({ blogId }) => {
           content: editContent,
         }),
       ).unwrap();
-      console.log("result", result);
 
       if (result.success) {
         setEditCommentId(null);
@@ -274,7 +270,6 @@ const CommentBox = ({ blogId }) => {
     setLoadingId(id);
     try {
       const result = await dispatch(likedComment(id)).unwrap();
-      console.log("result", result);
 
       if (result.success) {
         toast.success(result.message);

@@ -52,13 +52,11 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     if (file) {
       // store actual file
       setImageFile(file);
-      console.log("Selected file:", file);
 
       // preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        console.log("Selected file preview:", reader.result);
       };
 
       reader.readAsDataURL(file);

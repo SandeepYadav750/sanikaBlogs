@@ -11,7 +11,6 @@ export const fetchAllUsersCategories = createAsyncThunk(
       const response = await axios.get(`${API}/category/allUsersCategories`, {
         withCredentials: false,
       });
-      console.log("allUsersCategories:", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -86,7 +85,6 @@ export const updateCategory = createAsyncThunk(
           withCredentials: true,
         },
       );
-      console.log("API response for updateCategory:", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

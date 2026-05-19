@@ -13,9 +13,6 @@ const PopularAuthors = () => {
   const { allUsers, loading, error } = useSelector((state) => state.auth);
   const { publishedBlogs } = useSelector((state) => state.blog);
 
-  console.log("All users from Redux:", allUsers);
-  console.log("Published blogs from Redux:", publishedBlogs);
-
   // Fetch blogs and users when component mounts
   useEffect(() => {
     dispatch(fetchPublishedBlogs());

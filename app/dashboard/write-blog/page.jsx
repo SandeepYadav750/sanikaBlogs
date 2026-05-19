@@ -29,7 +29,6 @@ const WriteBlog = () => {
   const { categories, totalCategories } = useSelector(
     (state) => state.category,
   );
-  console.log("categories in WriteBlog:", categories, totalCategories);
   // const staticCategories = [
   //   { _id: "1", name: "Web Development" },
   //   { _id: "2", name: "SEO" },
@@ -78,12 +77,10 @@ const WriteBlog = () => {
 
     if (imageFile) {
       formDataApp.append("file", imageFile);
-      console.log("form submit", formDataApp, imageFile);
     }
 
     try {
       const result = await dispatch(createBlog(formDataApp));
-      console.log("createBlog result after Add slug:", result);
       if (createBlog.fulfilled.match(result)) {
         toast.success(result.payload.message);
         const BlogId = result.payload.blog?._id || result.payload._id;

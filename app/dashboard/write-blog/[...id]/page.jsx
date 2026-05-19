@@ -53,9 +53,7 @@ const BlogId = () => {
   const { categories, totalCategories } = useSelector(
     (state) => state.category,
   );
-  console.log("categories in WriteBlog:", categories, totalCategories);
 
-  // console.log("publishedBlogs", publishedBlogs);
   const [formData, setFormData] = useState({
     title: selectBlogData?.title,
     keywords: selectBlogData?.keywords,
@@ -96,12 +94,10 @@ const BlogId = () => {
 
     if (imageFile) {
       formDataApp.append("file", imageFile);
-      console.log("form submit", formDataApp, imageFile);
     }
 
     try {
       const result = await dispatch(updateBlog({ id, data: formDataApp }));
-      console.log("updateBlog result:", result);
       if (updateBlog.fulfilled.match(result)) {
         toast.success(result.payload.message);
         router.push("/dashboard/blogs");
@@ -115,7 +111,6 @@ const BlogId = () => {
       //   toast.error(error);
       // }
     } catch (error) {
-      console.log(error);
       console.error(error);
     }
   };
@@ -123,8 +118,6 @@ const BlogId = () => {
   const togglePublish = async () => {
     try {
       const result = await dispatch(togglePublishBlog(selectBlogData?._id));
-      // console.log("selectBlogData?._id", selectBlogData?._id);
-      console.log("togglePublish result:", result);
       if (togglePublishBlog.fulfilled.match(result)) {
         toast.success(result.payload.data.message);
       } else {
@@ -134,7 +127,6 @@ const BlogId = () => {
       //   setPublish(!publish);
       //   toast.success(result.data.message || "blog publish");
       //   // router.push("/dashboard/blogs");
-      //   console.log("selectBlogDatasuccess", selectBlogData);
       // } else {
       //   toast.error(result.data.message || "failed to published");
       // }
@@ -148,7 +140,6 @@ const BlogId = () => {
   const handleDeleteClick = (blogId) => {
     setSelectedBlogId(blogId);
     setDeleteDialogOpen(true);
-    console.log("blogId", blogId);
   };
 
   // Confirm delete
@@ -158,7 +149,6 @@ const BlogId = () => {
     try {
       const result = await dispatch(deleteBlog(selectedBlogId));
 
-      console.log("result", result);
       toast.error(error);
 
       if (deleteBlog.fulfilled.match(result)) {

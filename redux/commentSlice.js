@@ -12,7 +12,6 @@ export const fetchComments = createAsyncThunk(
         withCredentials: true,
       });
 
-      console.log("Fetch comments response:", response.data);
       return response.data;
     } catch (error) {
       console.error(
@@ -37,7 +36,6 @@ export const createComment = createAsyncThunk(
         },
       );
 
-      console.log("Create comment response:", response.data);
       return response.data;
     } catch (error) {
       console.error(
@@ -57,7 +55,6 @@ export const deleteComment = createAsyncThunk(
         withCredentials: true,
       });
 
-      console.log("delete comment response:", res.data);
       return res.data;
     } catch (error) {
       console.error(
@@ -82,7 +79,6 @@ export const editComment = createAsyncThunk(
         },
       );
 
-      console.log("edit comment response:", res.data);
       return res.data;
     } catch (error) {
       console.error("edit comment error:", error.res?.data || error.message);
@@ -99,7 +95,6 @@ export const likedComment = createAsyncThunk(
         withCredentials: true,
       });
 
-      console.log("like comment response:", res.data);
       return res.data;
     } catch (error) {
       console.error("like comment error:", error.res?.data || error.message);
@@ -116,7 +111,6 @@ export const getAllComment = createAsyncThunk(
         withCredentials: true,
       });
 
-      console.log("fetch all comment response:", res.data);
       return res.data;
     } catch (error) {
       console.error(
@@ -157,7 +151,6 @@ const commentSlice = createSlice({
         const commentsData =
           action.payload?.comments || action.payload?.data || action.payload;
         state.comments = Array.isArray(commentsData) ? commentsData : [];
-        console.log("Comments set in state:", state.comments);
         state.message = action.payload.message;
       })
       .addCase(fetchComments.rejected, (state, action) => {
@@ -177,7 +170,6 @@ const commentSlice = createSlice({
         const newComment = action.payload?.comment || action.payload?.data;
         if (newComment) {
           state.comments = [newComment, ...state.comments];
-          console.log("New comment added:", newComment);
         }
         state.message = action.payload.message;
       })
@@ -230,7 +222,6 @@ const commentSlice = createSlice({
           state.comments = state.comments.map((item) =>
             item._id === commentId ? { ...item, content: newContent } : item,
           );
-          console.log("Comment edited:", commentId);
         }
         state.message = action.payload?.message || "Comment Edit successfully";
       })
@@ -255,7 +246,6 @@ const commentSlice = createSlice({
         state.comments = state.comments.map((item) =>
           item._id === commentId ? updatedComment : item,
         );
-        console.log("like set in state:", state.comments);
         state.message = action.payload.message;
       })
       .addCase(likedComment.rejected, (state, action) => {
@@ -274,7 +264,6 @@ const commentSlice = createSlice({
         state.loading = false;
         // state.comments = action.payload;
         state.allComments = action.payload;
-        console.log("getAllComment set in state:", state.comments);
         state.message = action.payload.message;
       })
       .addCase(getAllComment.rejected, (state, action) => {

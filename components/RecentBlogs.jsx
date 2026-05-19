@@ -47,7 +47,6 @@ const RecentBlogs = () => {
       (cat) => cat?.userId?._id?.toString() === blog?.author?._id?.toString(),
     );
   });
-  console.log("filteredBlogs:", filteredBlogs);
   const top5Blogs = publishedBlogs?.slice(0, 5);
   const categoryCount = (isAuthenticated ? filteredBlogs : top5Blogs).reduce(
     (acc, blog) => {

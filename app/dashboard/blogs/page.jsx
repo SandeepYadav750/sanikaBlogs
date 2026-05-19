@@ -142,7 +142,6 @@ const BlogList = () => {
 
   // Handle view blog - only for published blogs
   const handleViewBlog = (blogSlug) => {
-    console.log("Attempting to view blog at URL:", blogSlug);
     if (isBlogPublished(blogSlug)) {
       router.push(`/blog/${blogSlug}`);
     }
