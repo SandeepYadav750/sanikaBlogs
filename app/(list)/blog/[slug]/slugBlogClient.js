@@ -37,19 +37,24 @@ import CommentBox from "@/components/CommentBox";
 import { fetchUserLikedBlogs, toggleLikeBlog } from "@/redux/blogSlice";
 import { fetchAllUsersCategories } from "@/redux/categorySlice";
 
-const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
+const SingleBlog = ({ initialBlog }) => {
+  // ← USE the initialBlog prop
   const router = useRouter();
   const dispatch = useDispatch();
-  
+
   // Start with the server-provided blog data
   const [selectedBlog, setSelectedBlog] = useState(initialBlog);
   const [saved, setSaved] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [blogLikeCount, setBlogLikeCount] = useState(initialBlog?.likes?.length || 0);
+  const [blogLikeCount, setBlogLikeCount] = useState(
+    initialBlog?.likes?.length || 0,
+  );
   const [initialFetchDone, setInitialFetchDone] = useState(!!initialBlog); // Set to true if we have initialBlog
 
-  const { likedBlogs = [], loading = false } = useSelector((store) => store.blog || {});
+  const { likedBlogs = [], loading = false } = useSelector(
+    (store) => store.blog || {},
+  );
   const { user } = useSelector((state) => state.auth?.user || {});
   const { allUsersCategories } = useSelector((state) => state.category);
 
@@ -420,7 +425,7 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
               </div>
 
               {/* Tags Section */}
-              <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+              <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-900">
                 <div className="flex flex-wrap gap-2">
                   {relatedCategories.length > 0
                     ? relatedCategories.map((cat, index) => (
@@ -430,7 +435,7 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
                           }
                           key={index}
                           variant="secondary"
-                          className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                          className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-2 py-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                         >
                           {cat.name}
                         </Badge>
@@ -441,7 +446,7 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
             </article>
 
             {/* Engagement Section */}
-            <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-800">
+            <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-900">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
                   <Button
@@ -481,7 +486,7 @@ const SingleBlog = ({ initialBlog }) => {  // ← USE the initialBlog prop
             <CommentBox blogId={selectedBlog._id} />
 
             {/* Navigation Buttons */}
-            <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-800 flex gap-2 items-center justify-between">
+            <div className="mt-6 pt-4 md:mt-12 md:pt-8 border-t border-gray-200 dark:border-gray-900 flex gap-2 items-center justify-between">
               <Button
                 variant="outline"
                 onClick={() => router.push("/dashboard/blogs")}

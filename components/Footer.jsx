@@ -20,7 +20,7 @@ const Footer = () => {
           <div className="flex items-center gap-2 mb-5">
             <Image src="/favicon.png" width={50} height={50} alt="favicon" />
             <h2 className="text-2xl font-bold text-white tracking-tight">
-              Blog<span className="text-red-500">.</span>
+              Sanika Blogs<span className="text-red-500">.</span>
             </h2>
           </div>
 
